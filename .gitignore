@@ -1,0 +1,18 @@
+*.vscode
+
+# Latex
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.synctex.gz
+*.synctex(busy)
+*.synctex.gz(busy)
+*.fdb_latexmk
+*.fls
+*.dvi
+
