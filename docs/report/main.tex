@@ -117,28 +117,23 @@
 
     \section{Recursos disponibles}
 
-        Mencionar que tenemos de cota superior 100 dólares, pero que el socio formador prefiere un costo de alrededor de los 50 dólares
+        La organización socio formadora ha estipulado que el auditor propuesto no puede superar un costo total de 100 USD; sin embargo ha manifestado su preferencia por un auditor que tenga un costo alrededor de los 50 USD. Para emular dichos dispositivos se propone el uso de dos tarjeta de microprocesador Raspberry Pi (modelo a determinar en base a disponibilidad del laboratorio de robótica).
 
-        Disponemos de acceso a los servicios de EC2 de Amazon para el despliegue de un servidor que podamos usar para hostear una base de datos
+        Para la emulación del centro de control se propone utilizar una instancia de EC2 de Amazon Web Services, en la que se emulará un servidor con una base de datos que utilice MySQL.
 
     \section{Objetivos}
 
+        Los objetivos de este proyecto deben de ser vistos desde 2 esquemas cualitativos:
+        \begin{enumerate}
+            \item \textbf{Fines académicos}: Desarrollo de una primitiva criptográfica de clave pública sin hacer uso de bibliotecas de terceros para el cómputo de las claves. Aclarando que no existen limitaciones para el uso de bibliotecas que realicen de forma eficiente algunas operaciones matemáticas necesarias
+            \item \textbf{Términos ingenieriles}: Desarrollo de una arquitectura de red que permita que un conjunto de dispositivos auditores envíen lecturas de consumo y generación de energía eléctrica a un centro de control por medio de una conexión WiFi. Se parte de que los auditores tienen poder computacional bajo, y los datos generados deben de ser enviados y almacenados de forma segura.
+        \end{enumerate}
 
-    En fines académicos se busca:
-
-        Desarrollo de una primitiva criptográfica de clave pública sin hacer uso de bibliotecas de terceros para el cómputo de las claves. Aclarando que no existen limitaciones para el uso de bibliotecas que realicen de forma eficiente algunas operaciones matemáticas que necesitemos
-
-            En términos ingenieriles:
-
-        Desarrollo de un sistema de monitoreo de consumo y producción eléctrica de una vivienda, dicho sistema enviará cada determinado lapso de tiempo las lecturas pertinentes a un centro de control por medio de una conexión a internet. Se busca también que dicha información se almacene dentro de una base de datos para su análisis futuro.
-
-            Las etapas anteriormente mencionadas
-
-        De forma concreta en términos económicos y de tiempo computacional:
-
-        Se busca que el auditor propuesto tenga un costo inferior a los 100 USD, pero que de preferencia se encuentre en un precio menor a 50 USD
-
-            El envío de las lecturas debe de ocurrir cada 15 minutos
+        En términos cuantitativos se plantean las siguientes metas:
+        \begin{enumerate}
+            \item Costo total del dispositivo auditor menor a \textbf{100 USD} por pieza
+            \item El tiempo de envío seguro de datos debe de ser menor a \textbf{15 minutos}, puesto que las lecturas son generadas en ventanas de tiempo de 15 minutos
+        \end{enumerate}
 
     \section{Arquitectura de red propuesta}
 
@@ -178,7 +173,7 @@
             \item Ricardo Camacho Castillo
             \item Michelle Yareni Morales Ramóz
             \item Emily Rebeca Méndez Cruz
-            \item Daniela García Coindreaz
+            \item Daniela García Coindreau
             \item Carolina Longoria Lozano
         \end{itemize}
 
