@@ -78,14 +78,20 @@
 
     \section{Introducción}
 
-        \begin{itemize}
-            \item Descripción general del trabajo que se realizará, mencionando brevemente el caso de negocio que buscamos resolver
-            \item Describir la estructura del reporte técnico
-        \end{itemize}
+        Mientras avanzamos en el camino de la industrialización, los datos se vuelven más y más vitales para el funcionamiento de cualquier empresa. Más allá de ser de suma importancia para el análisis de su rendimiento, muchas veces son una parte esencial del proceso. Las fugas de información no son necesariamente nuevas, pero la era digital ha permitido que ocurran de una manera masiva, y ha llegado a afectar a empresas renombradas como Yahoo, Microsoft y Facebook \cite{data_breach_biggest}. Muchas veces estas empresas manejan datos sensibles, y una filtración de datos es un problema grave para ellos y sus usuarios.
 
+        Este es el caso para nuestros socios formadores, \textit{Cocoa} y \textit{LiCore}. \textit{Cocoa} se enfoca en facilitar la transición energías limpias utilizando herramientas digitales y  \textit{LiCore} se enfoca en desarrollar tecnología electrónica en áreas relacionadas a la energía sostenible. Una parte clave en su proceso consiste en documentar información de la cantidad y calidad de la energía, que al obtenerse pasa a un auditor, y de el auditor a un centro de control. Estos datos son sumamente sensibles, por lo que implementaremos criptografía de clave pública para proteger el almacenamiento y la comunicación de estos datos en el IoT.
+
+        A continuación estableceremos el objeto de nuestro estudio, plantearemos el problema a ser solucionado y elaboraremos una justificación. Después, haremos una investigación extensa sobre el estado del arte. Analizaremos los recursos disponibles para la resolución del problema, y nuestros objetivos para solucionarlo. Determinaremos la arquitectura de red a ser utilizada y propondremos nuestra metodología. Finalmente, discutiremos los resultados obtenidos.
+
+    % Descripción general de canvas
     \section{Objeto de estudio}
 
-        Implementación de (protocolo?) criptográfico para el envío de mediciones de generación y consumo de un panel solar a un centro de control por medio de una conexión WiFi. El centro de control para nuestro caso de estudio es una instancia de servidor de EC2 de Amazon, y el conjunto de auditores que procesan y envían esos datos son dispositivos IoT de bajo poder de procesamiento pero costo reducido, suponemos también un uso menor de energía eléctrica
+        El caso de estudio general que compete a un proyecto como el presentado es la implementación de una arquitectura de clave pública para un \textit{SmartGrid}, que es equivalente a una red heterogénea de dispositivos IoT \cite{smart_grid_def}.
+
+        La implementación de dicha arquitectura viene de la mano con un conjunto de desafíos asociados al poder computacional restringido de los dispositivos IoT, la necesidad de que la comunicación entre los miembros de la red suceda casi en tiempo real, en la disponibilidad de recursos económicos para la construcción y selección de los dispositivos físicos y/o servicios a contratar, y en la técnica a implementar para resguardar los datos de los auditores en una base de datos segura.
+
+        Los datos a enviar serán de carácter energético, conteniendo información del consumo y generación de energía eléctrica asociados a un domicilio y a una etiqueta de tiempo.
 
     \section{Planteamiento del problema}
 
@@ -93,27 +99,17 @@
 
     \section{Justificación}
 
-        Justificar por qué nos deberían de dar recursos para el reto
+        % Justificar por qué nos deberían de dar recursos para el reto
 
-        Descripción de algunos ataques a dispositivos IoT por el mal uso de primitivas criptográficas, creo que no necesita estar específicamente aplicado al caso de estudio de dispositivos de medición de paneles solares, pero si encontramos algún caso, le daría mucha validez al reto, desde aquí le podríamos meter miedo al socio formador
+        % Descripción de algunos ataques a dispositivos IoT por el mal uso de primitivas criptográficas, creo que no necesita estar específicamente aplicado al caso de estudio de dispositivos de medición de paneles solares, pero si encontramos algún caso, le daría mucha validez al reto, desde aquí le podríamos meter miedo al socio formador
 
-        Justificar los requerimientos base del problema (como los que vienen en canvas de criptografía ligera)
+        % Justificar los requerimientos base del problema (como los que vienen en canvas de criptografía ligera)
 
         % Incluir Objetivos de Desarrollo Sostenible en la justificación del proyecto
 
+
     \section{Estado del arte}
 
-        Hablar de arquitecturas de red utilizadas en un contexto similar al del reto, ya tenemos algo de P2P, pero tiene que ser algo resumido que después podamos usar para argumentar la selección de red, al final siempre queremos la más sencilla, robusta y económica.
-
-        Hablar también de criptografía de clave pública, necesitamos de esta parte principalmente de casos de estudio en los que se hayan aplicado algunas técnicas como RSA/ECC para la generación de las claves privadas y públicas
-
-        [NOTE] A partir de aquí somos libres de usar las librerías que queramos
-
-        Después debemos de buscar el cómo se hace regularmente el envío de información de un dispositivo IoT hacia un servidor. ¿Hay alguna forma eficiente de realizarlo con alguna librería ya implementada?
-
-        Luego debemos de hacer mención de la parte de CI/CD, qué políticas se establecerán para la actualización del software del auditor? Así como las prácticas criptográficas necesarias para validar el software que se descargue
-
-        Hablar también de algunas técnicas generales de encriptado de bases de datos, en teoría dispondremos de una instancia de EC2 en la que nosotros tendremos que levantar el servidor y hostear la base de datos
 
     \section{Recursos disponibles}
 
@@ -131,39 +127,18 @@
 
         En términos cuantitativos se plantean las siguientes metas:
         \begin{enumerate}
-            \item Costo total del dispositivo auditor menor a \textbf{100 USD} por pieza
-            \item El tiempo de envío seguro de datos debe de ser menor a \textbf{15 minutos}, puesto que las lecturas son generadas en ventanas de tiempo de 15 minutos
+            \item Costo total del dispositivo auditor menor a \textbf{100 USD} por pieza.
+            \item El tiempo de envío seguro de datos debe de ser menor a \textbf{15 minutos}, puesto que las lecturas son generadas en ventanas de tiempo de 15 minutos.
         \end{enumerate}
 
     \section{Arquitectura de red propuesta}
 
         Hablar más a detalle de la arquitectura propuesta, enunciando qué componente fungirá cada papel, es como lo que el profe dice de "ponerle nombre y apellido", proponer una nomenclatura para generar identificadores únicos?
 
-    \section{Propuesta metodológica}
+        % Seguir arquitectura propuesta por el paper de ECC
 
-        Enunciar los pasos del reto en el orden correcto
-        [TEMP] Necesito validar con el profe que estos sean los correctos:
-        Arranque de la red
+        % Imagen de diagrama de red propuesto
 
-    \section{Experimentación y resultados}
-
-        Generar un análisis estadístico sencillo del tiempo de cómputo de nuestra implementación, podemos compararla con el de librerías prestablecidas
-
-        Demostrar que nuestra implementación cumple con una suite de vectores de prueba, que puede estar basada en los de las librerías grandes
-
-    \section{Discusión de resultados}
-
-        En esta parte argumentamos la eficiencia de nuestra implementación con los datos de la sección pasada
-
-    \section{Objetivos de Desarrollo Sostenible}
-
-        Argumentar el por qué se han seguido los 3 ODS propuestos en canvas:
-
-        Objetivo 7. Garantizar el acceso a una energía asequible, segura, sostenible y moderna para todos.
-
-        Objetivo 9. Industria, innovación e infraestructura (ej. Protección de entornos Wireless, Navegación segura por Internet, entornos Near Field Communication (NFC)).
-
-        Objetivo 13. Adoptar medidas urgentes para combatir el cambio climático y sus efectos.
 
     \section{Medio de contacto}\label{sec:contact}
 
@@ -183,7 +158,7 @@
             \item Dr. Daniel Otero Fadul
         \end{itemize}
 
-        El benefactor principal del proyecto es la organización \textit{Licore}, la comunicación con la organización se vio llevada principalmente por el Dr. Iván S. Razo-Zapata.
+        El benefactor principal del proyecto es la organización \textit{LiCore}, la comunicación con la organización se vio llevada principalmente por el Dr. Iván S. Razo-Zapata.
 
         En caso de encontrar fallas en el código fuente, o que se necesite de una aclaración de la implementación propuesta; se pide que se abra un \textit{issue} en el repositorio en GitHub que puede ser accedido desde la siguiente \href{https://github.com/JuanEcheagaray75/licore-pki}{liga}.
 
