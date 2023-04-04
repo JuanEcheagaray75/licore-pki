@@ -10,6 +10,9 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
 \usepackage{soul}
+\usepackage{tabularx}
+\usepackage{csquotes}
+\usepackage{enumitem}
 
 \decimalpoint
 \renewcommand{\baselinestretch}{1.5}
@@ -78,187 +81,290 @@
 
     \section{Introducción}
 
-        \subsection{Situación en México}
+        Mientras avanzamos en el camino de la industrialización, los datos se vuelven más y más vitales para el funcionamiento de cualquier empresa. Más allá de ser de suma importancia para el análisis de su rendimiento, muchas veces fungen como materia prima de sus procesos. Las fugas de información no son necesariamente nuevas, pero la era digital ha permitido que ocurran de una manera masiva, y ha llegado a afectar a empresas renombradas como Yahoo, Microsoft y Facebook \cite{data_breach_biggest}. Muchas veces estas empresas manejan datos sensibles, y una filtración de datos es un problema grave para ellos y sus usuarios.
 
-            En el 2015, se estableció una ley llamada "Ley de transición energética." El objetivo de esta ley es regular el uso de la energía sustentable, así como la obligaciones en materia de energías limpias y reducción de emisiones de contaminantes en la industria eléctrica. Para así mantener la competitividad de los sectores productivos. \cite{gobmx} En otras palabras, esta ley busca tener un incremento gradual de la participación de la energías limpias en la industria eléctrica con el objetivo de reducir emisiones.
+        Este es el caso para nuestros socios formadores, \textit{Cocoa} y \textit{LiCore}. \textit{Cocoa} se enfoca en facilitar la transición energías limpias utilizando herramientas digitales \cite{cocoa}, y  \textit{LiCore} se enfoca en desarrollar tecnología electrónica en áreas relacionadas a la energía sostenible. Una parte clave en su proceso consiste en documentar información de la cantidad y calidad de la energía, que al obtenerse pasa a un auditor, y del auditor a un centro de control. Estos datos al ser de carácter sensible, necesitan ser transmitidos por un medio seguro, por lo que es imperativo la implementación de un medio de transporte seguro que se adapte a los dispositivos que utiliza el Socio Formador.
 
-            Hoy en día, existen muchos países que están trabajando en esta transición para poder llegar al 100\% de uso de energía renovable. Como se observa en la Figura \ref{fig:energiaM} Brasil es el país con el porcentaje más alto de uso de energía renovable arriba del 80\%, seguido por Canadá con el porcentaje de uso arriba del 60\%, seguido por Alemania, Inglaterra, Italia y Turquía con un porcentaje arriba del 40\%. En la gráfica se observa que México esta posicionado en decimoquinto lugar con un porcentaje aproximadamente del 20\% y además se observa que entre los años 2015 y 2020, México tuvo un incremento de uso de energía renovable del 31\%. \cite{climate_transparency}
+        A continuación estableceremos el objeto de nuestro estudio, plantearemos el problema a ser solucionado y elaboraremos una justificación. Después, haremos una investigación extensa sobre el estado del arte. Analizaremos los recursos disponibles para la resolución del problema, y nuestros objetivos para solucionarlo. Determinaremos la arquitectura de red a ser utilizada y propondremos nuestra metodología. Finalmente, discutiremos los resultados obtenidos.
 
-            \begin{figure}[h]
+    % Descripción general de canvas
+    \section{Objeto de estudio}
+
+        El caso de estudio general que compete a un proyecto como el presentado es la implementación de un protocolo de clave pública para un \textit{SmartGrid}, que es equivalente a una red heterogénea de dispositivos IoT \cite{smart_grid_def}.
+
+        La implementación de dicha arquitectura viene de la mano con un conjunto de desafíos asociados al poder computacional restringido de los dispositivos IoT, la necesidad de que la comunicación entre los miembros de la red suceda casi en tiempo real, en la disponibilidad de recursos económicos para la construcción y selección de los dispositivos físicos y/o servicios a contratar, y en la técnica a implementar para resguardar los datos de los auditores en una base de datos segura.
+
+        Los datos a enviar serán de carácter energético, conteniendo información del consumo y generación de energía eléctrica asociados a un domicilio y a una etiqueta de tiempo. Los datos generados son de carácter sensible, pues algún agente malicioso podría utilizar algún método de \textit{spyware} para recolectar dichos datos, realizar algún proceso de caracterización para lanzar un ataque acotado y personalizado a los entes asociados al conjunto de datos vulnerados.
+
+    \section{Planteamiento del problema}
+
+        \subsection{Descripción general de la problemática}
+
+            En la Figura \ref{fig:dataExchange} se muestra un esquema simplificado más general de la red \textit{SmartGrid} que se busca asegurar. En primera instancia, se busca proteger el intercambio de información entre cada auditor y el control center. Se busca asegurar la confidencialidad, integridad y autenticidad en todo el proceso de comunicación para que solamente los dispositivos autorizados por el centro deo control puedan publicar y acceder a los datos medidos, que la información medida no sufra de alteración alguna y que existan los medios suficientes para aplicar un criterio de no repudio a los auditores participantes de la red.
+
+            En conjunto con la Figura \ref{fig:dataExchange}, se proporciona la Tabla \ref{tab:component_basic} en la que se enumera y describen las labores de los componentes básicos de la red solicitada por el Socio Formador.
+            \begin{table}[htbp]
                 \centering
-                \includegraphics[scale = 0.30]{img/energiaMundo.png}
-                \caption{Porcentaje de uso de energía renovable por país en el 2021 \cite{climate_transparency}}
-                \label{fig:energiaM}
-            \end{figure}
+                \begin{tabularx}{\textwidth}{ |l|X|X| }
+                    \hline
+                    Componente & Función & Dispositivo \\
+                    \hline
+                    SmartMeter	& Monitoreo de parámetros de consumo y generación de energía eléctrica, envío de datos medidos a su auditor respectivo por medio de WiFi & No aplica \\
+                    \hline
+                    Auditor	& Recolección de datos de SmartMeters, envío de datos al centro de control & Microcontroladores, tarjetas tipo Raspberry Pi \\
+                    \hline
+                    Centro de control & Procesamiento de lecturas enviadas por auditores, respaldo encriptado de mediciones en una base de datos & Servidor en la nube \\
+                    \hline
+                \end{tabularx}
+                \label{tab:component_basic}
+                \caption{Listado general de los componentes de la red}
+            \end{table}
 
-            Actualmente, México cuenta con un combinación de varios tipos de energía renovable: solar, eólica, hidroeléctrica, geotérmica, nuclear e instalaciones de bioenergía. México es el segundo país en América Latina con el sector de energía solar más grande, con una capacidad instalada un poco más de 7 GW en 2021, seguido por la energía eólica en 7.7 GW, luego la producción geotérmica con 976 MW. \cite{mexico} Hoy en día, se cuenta con 300,624 instalaciones y se espera que para el 2023 se tengan más de 500 mil instalaciones.
-
-            Sin embargo, aunque el sector de energía renovable siga creciendo desde su primera operación en el 2007 con su primer planta, muchas de estas instalaciones solamente se instalan y se olvidan no los consultan ni dan seguimiento a mantenimiento. Por esta razón, se busca mejorar la situación de la red de situación para que sea más inteligente y contar con medidores inteligentes que ayuden a saber que esta sucediendo con la instalación.
-
-        \subsection{Sobre el reto}
-
-            El entorno de comunicación actual requiere la protección de datos durante el tránsito y el almacenamiento. En el caso concreto del trabajo que se está realizando, el objetivo es imaginar e implementar importantes proyectos criptográficos públicos en entornos IoT. En otras palabras:
-
-            \begin{itemize}
-                \item Los esquemas de clave pública deberán funcionar en ambientes con recursos restringidos.
-                \item La comunicación entre todos los elementos involucrados deberá ser segura.
-                \item Los esquemas de clave pública deberán involucrar el uso de esquemas lightweight.
-                \item Los datos almacenados en el centro de control deberán estar encriptados
-                \item Deberá existir un canal de comunicación bidireccional entre el centro de control y los auditores.
-            \end{itemize}
-
-            \begin{figure}[h]
+            \begin{figure}[htbp]
                 \centering
-                \includegraphics[scale = 0.30]{img/dataExchange.png}
-                \caption{Intercambio de Datos a ser Protegido}
+                \includegraphics[scale=0.30]{img/dataExchange.png}
+                \caption{Intercambio de Datos a ser Protegido [Extraído de CANVAS]}
                 \label{fig:dataExchange}
             \end{figure}
 
-            Para fines de este reto, como podemos ver en la Figura \ref{fig:dataExchange}, en primera instancia, se busca proteger el intercambio de información entre el auditor y el control center. Algunas características que se desean proveer son:
-             \begin{itemize}
-                \item \textbf{Confidencialidad:} Se busca que solamente los elementos involucrados accedan a la información proporcionada por los sensores. Se aplica la misma condición cuando se almacenan los datos en el Centro de Control, para que puedan revisar dicha información todos los que estén autorizados a hacerlo.
-                 \item \textbf{Integridad:} Se busca que la información provista por los sensores no sea alterada y se pueda verificar dicha condición. Lo mismo aplica cuando dicha información se almacene en el Centro de Control.
-                 \item \textbf{Autenticidad:} Se desea que cada sensor pueda ser monitoreado e identificado, para así determinar qué datos generaron.
-             \end{itemize}
+        \subsection{Delimitación del problema}
 
-             Además, de la Figura \ref{fig:dataExchange} podemos observar los siguientes componentes:
+            Para fines académicos a organización socio-formadora propone el escenario representado en la Figura \ref{fig:esquema}. Se dispondrá de dos auditores, que reportan el consumo y generación de energía eléctrica de 2 residencias distintas. Los datos en cuestión no serán obtenidos en tiempo real, sino que han sido proporcionados por el socio-formador en el formato de un archivo csv con los registros históricos de las mediciones.
 
-             \begin{itemize}
-                 \item Dispositivos smart que serán los encargados de monitorear parámetros de energía cada cierto tiempo (smart meter, smart inverter, load center). Estos dispositivos contarán con una interfaz WiFi para comunicarse con el exterior. Para fines del reto, los datos comunicados por estos dispositivos serán proporcionados por la OSF “en crudo” para que puedan ser utilizados. Se manejarán de forma muy cautelosa los datos.
-                 \item Auditores digitales que recolectarán datos de los dispositivos smart conectados a ellos. Para fines del reto, consideren:
-                 \begin{enumerate}
-                     \item El uso de tarjetas Arduino o Raspberry con capacidad WiFi.
-                     \item Usar sus equipos de cómputo para habilitarlos como auditores, pero considerando que la solución debe ser consistente como si estuvieran usando una Raspberry o un Arduino.
-                 \end{enumerate}
-                 \item El control center que será capaz de consultar el estado previo y actual de cada dispositivo smart  conectado a los auditores.
-             \end{itemize}
+            Los datos recolectados por los auditores deben de ser enviados por internet protegidos hasta que lleguen al Centro de Control. En el Centro de Control, los datos serán almacenados en una base de datos en donde serán respaldados con un esquema de encriptado seguro.
 
-            En este reto se estará trabajando con la organización socio-formadora COCOA Collabrorative Innovation B.V. COCOA es una organización impulsada por la innovación con el uso de la tecnología digital. Su enfoque principal es la innovación digital para abordar desafíos de la sostenibilidad actual. Específicamente, trabajan con monitoreo de datos para la sostenibilidad, herramientas de apoyo a la toma de decisiones espaciales y finanzas sostenibles/climáticas. Además, la organización busca aportar eficiencia y transparencia a los esfuerzo globales para el logro de los Objetivos de Desarrollo Sostenible (ODS). \cite{cocoa} Actualmente, ellos trabajan con la empresa LICORE, una organización mexicana que se centra en el desarrollo de tecnología electrónica para la industria de la eficiencia energética y las redes inteligentes.
-
-            La organización socio-formadora propone el siguiente escenario para el reto como se observa en la Figura \ref{fig:esquema} Se tendrán dos auditores, un auditor reporta datos de un medidor inteligente y el otro auditor reporta datos de un inversor inteligente. Los datos de los auditores serán proporcionados por el socio-formador. Los datos que se estarán recolectando de estos dispositivos tendrán que viajar por el internet protegidos hasta que lleguen al centro de control. En el centro de control, los datos serán almacenados en una base de datos en donde tendrán que ser almacenados de manera encriptada.
-
-             \begin{figure}[h]
+            \begin{figure}[h]
                 \centering
                 \includegraphics[scale=0.35]{img/esquema_reto.png}\\
-                \caption{Esquema sugerido para la prueba de concepto (PdC).}
+                \caption{Esquema sugerido para la prueba de concepto (PdC).[Imagen referenciada de CANVAS]}
                 \label{fig:esquema}
             \end{figure}
 
-            En general, el objetivo principal del reto es implementar protocolos de criptografía de clave pública para proteger el intercambio de datos de sensores en ambientes IoT, los datos que se estarán manejando son datos que tienen que ver con el monitoreo y consumo de energía, estos datos sensibles. Los protocolos se buscan aplicar de manera balanceada. Además, se busca que el intercambio de datos sea de manera automática ya que los datos tienen que ver con el estados de los sensores en un dicho tiempo al igual que la actualización de su firmware.
+    \section{Justificación}
 
-    \section{Estado del Arte} \label{sec:introduction}
+        \subsection{Enfoque en Sostenibilidad}
 
-        En el artículo 'Internet of things: Privacy issues revisited' menciona que el anonimato en la comunicación tiene el objetivo de proteger los datos de tráfico para que la información se mantenga confidencial, pero incluso si el contenido de la comunicación se mantiene confidencial puede llegar a filtrarse por datos de tráfico que incluyen identidades y ubicaciones de las partes que se están comunicando, hora, frecuencia y volumen de la comunicación \cite{Weber}.
-
-        A continuación se presentarán algunos estudios y trabajos relacionados al análisis de los sistemas IoT:
-
-        De acuerdo al artículo 'Métodos de criptografía ligera para brindar servicios de seguridad al Internet de las Cosas' dentro de los nodos del IoT se encuentran restricciones como bajo poder computacional, alimentación por baterías o se presenta un ancho de banda limitado. Dentro del artículo se buscan métodos novedosos para servicios de seguridad por medio de la criptografía ligera, estos métodos permitirán garantizar la seguridad de la información para estos sistemas restringidos \cite{criptografia_ligera}.
-        Por el momento no existe una definición precisa en el estado del arte para el término algoritmo 'ligero', pero se emplea para referirse a diseños arquitecturales simplificados que reducen el número de operaciones que ejecuta con un impacto moderado dentro de la seguridad del algoritmo.
-
-        Los autores definen la criptografía ligera como '\textit{la rama de la criptografía que estudia el uso de algoritmos criptográficos adaptados a los requerimientos de aplicaciones que cuentan con recursos limitados en materia de: capacidad de procesamiento, hardware disponible, memoria, energía, canal de comunicaciones, entre otros}' \cite{criptografia_ligera}.
-        En el escrito se propone como solución, en el caso de hardware, la implementación de sistemas de seguridad e introducir aceleradores de cómputo, en el caso de software, el uso  de un coprocesador como un circuito integrado de aplicación especifica.
-
-        En el artículo 'Aseguramiento de dispositivos IoT con Blockchain e Infraestructura de Clave Publica' se demuestra el poder de unir diferentes tecnologías, el blockchain y la clave publica, para conseguir acceso remoto confiable. Utilizan el uso de computación distribuida, bases de datos de-centralizadas y distribuidas, algoritmos criptográficos y blockchain híbridas. Por medio de una metodología de auditoría de riesgos, evalúan dos dispositivos en su estado natural y los cambios que tienen al implementarse la clave publica distribuida por blockchain. En ambos dispositivos el riesgo final fue menor al riesgo inicial, probando la eficacia del método.
-
-        Según el Ing. Omar Paniagua en su artículo \cite{villagomezdiseno} mencionó sobre el diseño de un prototipo IoT para pruebas de penetración y monitoreo de la seguridad en un sistema de domótica. Un sistema de domótica es el conjunto de maquinas con cierto nivel de inteligencia artificial que permite la automatización y que realice acciones dependiendo de los fenómenos captados por los elementos electrónicos interconectados. El prototipo de domótica se desarrolló para hacer pruebas de ataque y monitorear el comportamiento del sistema de detección y prevención de intrusos (IDS/IPS) en el sistema de domótica, el prototipo detectó satisfactoriamente los escaneos y pruebas de ataque, sin embargo, ante un ataque DDoS (denegación de servicio distribuido desde varios hosts) pueden llegar a denegar el servicio al sistema. \cite{villagomezdiseno}  En general, en el artículo concluyó que las medidas clave que garantizan una mayor seguridad son las siguientes:
-        \begin{itemize}
-            \item Autenticar todas las entidades del IoT que se pueden unir a la red de domótica utilizando criptografía de clave pública y certificados X.509 firmados por una autoridad raíz de confianza. Estos deben almacenarse siguiendo estándares de procesamiento FIPS. \cite{villagomezdiseno}
-            \item Para la seguridad del hardware se deben implementar protocolos de cifrado como TLS/DTLS para una transferencia segura, la integridad de datos se debe basar en hashes criptográficos SHA, se deben usar firmas digitales para el intercambio de datos, los datos deben clasificarse según la seguridad a niveles y datos críticos y esquemas de AAA/CIA, todo el software y firmware tiene que ser verificado, los sistemas informáticos deben mantenerse actualizados con parches de seguridad y toda la infraestructura centralizada debe de ser protegida contra la denegación de servicio por ataques DDoS. \cite{villagomezdiseno}
-        \end{itemize}
-
-    \subsection{Arquitecturas de intercambio de información}
-
-        \subsubsection{P2P}
-
-            La OSF es trabaja con un tipo de arquitectura de intercambio de información denominada peer-to-peer, que es una red de dispositivos de cómputo en donde todos o algunos aspectos funcionan sin clientes ni servidores fijos, ya que se trata de una serie de nodos que actúan simultáneamente como clientes y servidores respecto a otros nodos. De esta manera los usuarios pueden colocar archivos para compartir y todos los demás usuarios de la red pueden acceder a él.
-
-            Este tipo de redes permiten el intercambio de información en cualquier formato entre los ordenadores interconectados y una de las principales características de estos programas es que permiten visualizar el tráfico y controlar la velocidad de descarga de los archivos. Además, puede existir comunicación en tiempo real ya que cuentan con sistema de chat. \cite{p2p}
-
-        \ul{Tipos de redes P2P}
-
-        \begin{enumerate}
-        \item \textbf{Redes centralizadas:} son aquellas que trabajan con un sólo servidor que aloja toda la información
-        \item \textbf{Redes híbridas:} trabajan con varios servidores centrales y las descargas se ejecutan de los nodos.
-        \item \textbf{Redes descentralizadas:} trabajan con el sistema de nodos de modo que no utilizan servidores centrales de ningún tipo.%\cite{p2p.2}
-        \end{enumerate}
-
-        \ul{Ventajas y desventajas}
-
-        La ventaja de este tipo de redes es que permite compartir archivos de manera sencilla sin necesitar un servidor central, sin embargo, existen algunas desventajas ya que los nodos no son identificables y esto podría derivarse en fraude, virus o contenido ilícito, además, si los nodos dejan de aportar recursos no conseguirán la información deseada.
-
-
-    \subsection{Recursos disponibles}
-    Los recursos que se necesitarán para dar solución al reto son los siguientes.
-    \begin{itemize}
-        \item  Datos recolectados por los dispositivos Smart, que serán proporcionados por la OSF.
-        \item Auditores digitales, que implican también el uso de otros recursos.
-        \begin{itemize}
-            \item Tarjetas Arduino o Raspberry con capacidad Wifi.
-            \item Equipos de cómputo para habilitarlos como auditores
-        \end{itemize}
-    \end{itemize}
-%\cite{p2p.3}
-    \subsection{Arranque de la red}
-
-
-
-
-
-
-        \subsection{Side Channel Attacks}
-
-            Una dimensión más a considerar en el diseño e implementación de un protocolo criptográfico es la susceptibilidad del sistema a ser víctima de \textit{Ataques de Canal Lateral} (Side Channel Attacks). Este tipo de ataques se enfoca en la extracción de información latente generada por dispositivos pequeños que implementan algoritmos criptográficos \cite{shim2015survey}.
-
-            Un atacante que busque vulnerar dichos dispositivos físicos puede realizar análisis de:
+            Nuestro propósito se alinea con múltiples de los Objetivos de Desarrollo Sustentable de las ONU.
             \begin{itemize}
-                \item Consumo energético
-                \item Tiempo de cómputo
-                \item Radiación electromagnética
+                \item \textbf{Objetivo 9}: \enquote{Construir infraestructuras resilientes, promover la industrialización sostenible y fomentar la innovación.}  \cite{obj9} Lo vemos reflejado en nuestro deseo de innovar e industrializar sin sacrificar lo sostenible.
+                \item \textbf{Objetivo 11}: \enquote{Lograr que las ciudades sean más inclusivas, seguras, resilientes y sostenibles.} \cite{obj11} Este objetivo esta integrado en las bases del proyecto, con la intención del socio formador de acercar la energía al consumidor, y con su elección de utilizar energías renovables.
+                \item \textbf{Objetivo 12}: \enquote{Garantizar modalidades de consumo y producción sostenibles.}\cite{obj12} Es uno de nuestros principales enfoques, al utilizar algoritmos ligeros que serán lo mas sostenibles posibles, y al ayudar a que un proceso de producción de energía sostenible pueda efectuar de manera segura.
             \end{itemize}
 
-            Para mitigar el posible daño ocasionado de estos ataques se proponen 2 líneas de acción; modificaciones a la implementación del algoritmo criptográfico a nivel software, y adecuaciones en el hardware del dispositivo. Las modificaciones de software incluyen ruido aleatorio dentro de las señales, cambiar de forma aleatoria el orden en que se realizan los comandos (cuando aplique), añadir instrucciones falsas. A nivel de hardware las modificaciones se enfocan en enmascarar el consumo energético del dispositivo mediante la generación de ruido, o la aleatorización del cómputo (clock).
+        \subsection{Dimensión legal y económica}
 
-            %- El dispositivo se tiene que conectar a internet por medio de cable ethernet? O es desde Wifi que se conecta al internet?
-            %- El sensor recibe su fuente de energía de la generada por el panel solar? O es independiente?
-            %- Parece ser que una opción viable para este reto es el uso de curvas elípticas, en clase se mencionó que ofrecen el mismo nivel de seguridad que otros algoritmos, pero con muchos menos requerimientos de espacio y poder computacional
-            %	- Analizar nuitka, pypi, cython para compilar el código fuente que generemos, debería de aumentar la velocidad base del algoritmo, y reduce el tamaño
-            %- Considerar vulnerabilidades "side channel attack" una vez que hayamos implementado el algoritmo criptográfico
+            De acuerdo a IBM, el costo global promedio en 2022 de una filtración de datos fue de 4 millones de dólares \cite{cost_DB}. Esta cifra sigue un patrón de aumento a través del tiempo, lo que nos indica que cada vez se vuelve más caro tener datos desprotegidos. Lo económico no es lo único que se ve afectado por un ataque de esta naturaleza. El estudio del Instituto Ponmeon, "The Aftermath of a Mega Data Breach: Consumer Sentiment", clasifica a las filtraciones de datos como el tercer factor más influyente para la reputación de una empresa, junto con desastres naturales y mal servicio al cliente \cite{ponmeon}.
 
-    \section{Propuesta de solución del reto} \label{sec:introduction}
+            Cada segundo se conectan a internet alrededor de 127 dispositivos nuevos. Estos dispositivos atraen a ciberdelicuentes debido a que muchas de las personas que compran dichos aparatos desconocen los puntos importantes de ciberseguridad al momento de adquirirlo, el cual puede poner en riesgo la privacidad del usuario. Los dispositivos IoT usualmente son objetivo de ataques forzados. Los ataques forzados usando motores de búsqueda especializados en donde se seleccionan equipos de protocolos disponibles para conexión, así forzando de manera automática los nombres de usuario y contraseñas comunes. Se estima que a nivel global, la cifra de ataques a dispositivos IoT es mayor a los mil 500 millones. En México, el primer semestre de 2021 se detectaron 661 mil 715 ataques a dispositivos IoT \cite{rios_2022}. La cantidad de ataques tuvo un incremento de 197 por ciento a comparación con el año 2020 en donde se registran 222 mil 599.
 
+            Como se ha mencionado anteriormente los ataques a dispositivos IoT son comunes y costosos, a continuación se describirán algunos ataques o vulnerabilidades encontradas en dispositivos por el mal uso de primitivas criptográficas:
 
+            \begin{itemize}
+                \item En noviembre 2016, cibercriminales apagaron la calefacción de dos edificios en la ciudad finlandesa de Lappeenranta. Después de este ataque, se lanzó un segundo ataque DDoS, en donde obligaron a los controladores de calefacción a reiniciar el sistema repetidamente así evitando que la calefacción se encendiera. Este fue un ataque severo ya que en Finlandia se experimentan temperaturas muy bajas en esa época del año \cite{husar_2022}.
+                \item En el 2016, investigadores encontraron que alrededor de 100 millones de vehículos Volkswagen vendidos desde 1995 pueden ser atacados por cibercriminales con una facilidad relativa para abrir puertas de forma inalámbrica sin tener la llave. Los vehículos eran vulnerable debido a que se usaron una mínima cantidad de claves privadas compartidas, en donde una vez que se viole una sola clave privada entonces millones de vehículos se verán comprometidos ya que los 100 millones de vehículos y sus llaveros fueron programados con pocas claves secretas comunes utilizadas en todo el mundo. Esto comprometía la seguridad de los pasajeros ya que ellos suponen que el vehículo esta bien cerrado comprometiéndolos a un robo en la carretera, a que criminales coloquen discretamente un objeto o una persona con intenciones maliciosas dentro del automóvil, pone en riesgo la computadora de a bordo del vehículo en donde el criminal puede  desactivar los frenos mientras se enciende el sistema de limpiaparabrisas en una curva, etc  \cite{garcia_oswald_kasper_pavlides}.
+                \item En el 2017, se descubrió que decenas de millones de dispositivos como cámaras de vigilancia de aeropuertos, sensores, equipos de red y dispositivos de IoT eran vulnerables debido a una falla que permitía a los cibercriminales obtener control remoto sobre los dispositivos o bloquearlos. La vulnerabilidad encontrada la nombraron "Devil's Ivy". Esta fue descubierto debido a que investigadores de Senrio quienes seleccionaron cámaras de seguridad de alta gama fabricadas por Axis Communications en donde 249 de los 251 cámaras eran vulnerables a atacantes remotos no autenticados que podían interpretar una transmisión de vídeo, reiniciar cámaras o pausar una transmisión de vídeo mientras cometen un delito \cite{spring_2019}. Encontraron que no solamente Axis Communications usaba este software defectuoso si no que otras 34 compañías como Microsoft, IBM, Xerox y Adobe.
+            \end{itemize}
 
-    \subsection{Blockchain}
-     Blockchain es una forma nueva de documentar datos que consiste en una serie de datos inmutables, compartibles y con marca de tiempo los cuales son administrados por un grupo de computadoras.
+    \section{Estado del arte} \label{sec:state_art}
 
-    La información de blockchain, también llamada "cadena de bloques", se distribuye por medio de libros de contabilidad, libros los cuales registran la información en una comunidad. Cada transacción de cada uno de estos bloques debe de ser validada por cada uno de los miembros, además, existe una copia de dicha información para todos los involucrados, por lo que alterar los datos anteriores es imposible gracias al consenso. \cite{blockchain_education} \\
+        La interconexión de dispositivos IoT al internet es uno de los principales desafíos a los que se enfrentan los ingenieros de esta era digital. La naturaleza de recursos restringidos de los dispositivos disponibles vuelve complicada la aplicación directa de los algoritmos y protocolos criptográficos usuales que pueden correr sin más inconveniente en un ordenador de uso personal o un teléfono inteligente.
 
-    Estos libros de contabilidad sirven como una herramienta que determina la propiedad de cierto activo en cualquier momento, independientemente del tipo que tenga. La información de la cadena de bloques puede ir desde transferencias de dinero, documentos de identidad, propiedades, o cualquier otra información que requiera la validación de ambas partes para la confirmación y la responsabilidad. \cite{blockchain_tec} \\
+        Esta dificultad ha motivado el diseño de esquemas criptográficos ligeros que ofrecen un balance entre la robustez y seguridad de las interconexiones para con el costo y consumo energético en el que incurren los dispositivos.
 
-    Blockchain para empresas usa un registro compartido e inmutable al que sólo tienen acceso los miembros que tienen permiso. Los miembros de dicha red puede controlar qué información es visible para cada miembro u organización, así como también las acciones que pueden tomar.
+        \subsection{Dispositivos IoT Endpoint}
 
-    Blockchain ofrece beneficios comerciales como el ahorro de costos debido a una mayor eficiencia, velocidad y automatización. Blockchain reduce en gran medida el papeleo y los errores, se reducen los costos generales y de transacciones, para así reducir o eliminar la necesidad de que intermediarios o terceros tengan que verificar las transacciones.
+            El análisis inicial parte de la selección óptima del dispositivo que fungirá como auditor en la problemática propuesta, la literatura moderna se enfoca en microcontroladores o tarjetas que no suelen sobrepasar el costo de 50 USD. En \cite{el2018analysis} se realiza un sumario general de las tarjetas usadas comúnmente para después concretar un enfoque del desempeño de distintos algoritmos en una tarjeta \textit{Raspberry Pi 3B}.
 
-    Tipos de Blockchain:
-    \begin{enumerate}
-        \item \textbf{Blockchains Públicas:} Cualquiera puede descargar, adaptar o personalizar y realizar transacciones. Este tipo de blockchain requiere millones de máquinas. Produce la mayor inmutabilidad y transparencia, sin embargo, también tiene la máxima ineficiencia ya que los costos de almacenamiento y de electricidad que tiene son muy altos, además de la baja velocidad de transacción.
-        \item \textbf{Blockchains privadas:} Funcionan sólo por invitación y siguen un conjunto de reglas creadas por los que invitan. Debido a que hay un bajo número de personas que están involucradas, puede que sea más especializado, con altibajos con menor inmutabilidad y transparencia, una mayor centralización, eficiencia, velocidad y volumen de transacción. De esta manera se reduce el costo y los recursos utilizados.
-        \item \textbf{Consorcios blockchain:} Este tipo de blockchain es un híbrido entre lo probado y lo público, también funciona sólo por invitación o por solicitud, pero todas las personas invitadas tienen los mismos derechos de voto cuando toman decisiones por consenso.
-    \end{enumerate}
+            Una alternativa atractiva a una tarjeta de gama superior como la anterior, es el microcontrolador \textit{ESP32}. En \cite{anand2019secure} se emplea dicho microcontrolador en un ambiente similar a la problemática planteada por las bondades de la tarjeta que incluye una suite acelerada para la generación de claves públicas y privadas con RSA, la firma con SHA-256 y la facilidad de generar números suficientemente aleatorios (en el contexto criptográfico).
 
-    Ventajas de la tecnología Blockchain
-    \begin{itemize}
-        \item \textbf{Autenticidad:} Los usuarios tienen la posibilidad de mantener privados todos sus datos personales y de almacenamiento al mismo tiempo que pueden identificarse.
-        \item \textbf{Confianza:} Brinda suficiente confianza a las personas en las operaciones par poder llevar a cabo transacciones como certificados o pagos.
-        \item \textbf{Transparencia y origen:} Los usuarios pueden realizar transacciones teniendo el conocimiento de que cada una de las partes puede participar en la transacción.
-        \item \textbf{Inmutable:} Los registros son escritos y almacenados de forma permanente sin ninguna modificación, esto los vuelve inmutables.
-        \item \textbf{Descentralizada:} La nece-sidad de una autoridad centralizada que este a cargo de las transacciones y el mantenimiento de registros es eliminada.
-        \item \textbf{No hay mediadores:} Es posible que los usuarios realicen transacciones directamente entre ellos sin la necesidad de una tercera persona que funja de mediador.
-    \end{itemize}
-        \clearpage
-        \bibliographystyle{IEEEtran}
-        \bibliography{references.bib}
+            De forma similar se propone considerar la tarjeta \textit{Raspberry Pi Pico}; no se ha encontrado un artículo científico en el que se detalle su uso en un entorno como el propuesto, pero se recalca que las especificaciones técnicas de la tarjeta descritas en \cite{pico_specs} son equivalentes a las del \textit{ESP32}.
+
+            \begin{table}[htbp]
+                \centering
+                \begin{tabularx}{\textwidth}{ |X|X|l|X|X|X|X|X| }
+                    \hline
+                    Nombre & Chip & RAM & Disco Duro & Conectividad & OS & Lenguaje & Referencia \\
+                    \hline
+                    Raspberry Pi Model 3 B & ARM Cortex A53 & 1 GB & SD card & WiFi, Ethernet  & Raspbian OS & Python, C++, etc...  & \cite{el2018analysis}   \\
+                    \hline
+                    ESP32 & Tensilica Xtensa LX6 & 320 kB & 448 KB Rom & WiFi, Bluetooth & - & Micropython, Circuit Python & \cite{anand2019secure} \\
+                    \hline
+                    Raspberry Pi Pico & Arm Cortex-M0+ & 264 kB & 2 MB & WiFi & - & Micropython, C, C++ & \cite{pico_specs} \\
+                    \hline
+                \end{tabularx}
+                \label{tab:controllers}
+                \caption{Listado de microcontroladores factibles}
+            \end{table}
+
+        \subsection{Encriptado asimétrico}
+
+            La parte más complicada de la comunicación segura entre dispositivos IoT ocurre en la generación, firmado y verificación de mensajes utilizando clave pública y privada. En la actualidad existen 3 principales métodos de encriptado de clave pública que se utilizan entornos IoT como el nuestro, de forma particular se suele analizar el desempeño de RSA, DSA y ECDSA.
+
+            En \cite{el2018analysis} se realiza una comparativa de estos 3 algoritmos en una tarjeta Raspberry Pi 3B. El estudio encontró que en promedio a RSA le toma 20 veces más tiempo firmar un mensaje que ECDSA y utiliza un tamaño de llave 16 veces superior para el mismo nivel de seguridad; el único rubro en el que RSA supera a ECDSA es en el verificado de mensajes, donde es 3 veces más rápido. Se puede ver que en promedio ECDSA tiene el mejor desempeño.
+
+        \subsection{Encriptado simétrico}
+
+            Una vez que se ha establecido un secreto en común entre 2 entes se puede aplicar alguna de las técnicas de encriptado simétrico que conocemos; esta suele ser una de las partes más sencillas de cualquier protocolo criptográfico ya que suele ser computacionalmente eficiente y rápido de calcular para evitar problemas de latencia en los procesos de comunicación.
+
+            En \cite{el2018analysis} se realizó una comparativa de los algoritmos de cifrado DES, 3DES, AES128, AES192 y AES256. Una conclusión esperada era que los algoritmos de la clase DES tuvieran una huella reducida a comparación de la suite de AES; a pesar de que su estudio confirma el supuesto, el NIST tiene registros de vulnerabilidades de este algoritmo desde el 2016 \cite{des_vulnerable}.
+        \subsection{Firma digital}
+
+            Una parte fundamental de los algoritmos de encriptado descritos es la función \textit{hash}. La principal aportación de este componente es que brinda la habilidad de que un destinatario se asegure de que el mensaje que haya recibido no ha sido modificado en el transcurso de su envío.
+
+            Algunas de las cualidades que deben tener estas funciones hash es la sencillez con la que puede ser computada y el que sea segura a colisiones; se entiende por colisión el evento en el que a dos objetos distintos se les asigna un mismo hash.
+
+            En \cite{el2018analysis} se realiza un análisis general del desempeño de las funciones hash MD5, SHA-1, SHA-256 y SHA-512 en una tarjeta Raspberry Pi 3B. La investigación encuentra que las funciones hash MD5 y SHA-1 son las más veloces del conjunto original, sin embargo se ha declarado desde el 2008 que MD5 no es una función hash segura \cite{md5_vulnerable}; para el caso de SHA-1 ya se ha emitido un comunicado del \textit{NIST} que recomienda dejar de utilizar esta función \cite{sha1_vulnerable}.
+
+            En \cite{rao2019comparative} se realiza un estudio similar al anterior, pero enfocado a la función hash necesaria para el firmado con curvas elípticas. Su conjunto de pruebas consistió en parte de las mismas funciones anteriores en añadidura de HAVAL, KECCAK, y BLAKE. El estudio encontró que la familia SHA es de las mejores disponibles, pero es sobrepasada por la función hash BLAKE en cuanto a uso en curvas elípticas concierne.
+
+        \subsection{Protocolos criptográficos}
+
+            Al final del día las funciones y componentes mencionadas representan partes estrictamente aisladas del protocolo criptográfico a implementar para asegurar las conexiones en la red propuesta. Es por eso que después se proponen mezclas y técnicas que implementan los algoritmos criptográficos base que después son acotados y personalizados a diferentes casos de estudio.
+
+            En \cite{abreu2020identity} se propone un enfoque similar a arquitecturas cliente-servidor, en el que se envían datos por medio de HTTPS haciendo uso de TLS para asegurar las vías de comunicación. El estudio propuso una arquitectura que necesita de menos mensajes para asegurar un canal de comunicación, pero que no logra concretar una política de acceso detallada basada en los recursos a los cuales se desea acceder y/o modificar.
+
+            En \cite{lohachab2019ecc} se propone un esquema ligero que no utiliza el concepto de certificados para el proceso de autenticación y autorización, para ser remplazados por un esquema de comunicación sobre MQTT incluyendo \textit{hasheo} con firmado de claves públicas generadas de forma local, sin que se incurra en un alto consumo energético o que se añada una latencia descomunal al proceso de comunicación.
+
+    \section{Recursos disponibles}
+
+        La organización socio formadora ha estipulado que el auditor propuesto no puede superar un costo total de 100 USD; sin embargo ha manifestado su preferencia por un auditor que tenga un costo alrededor de los 50 USD. Para emular dichos dispositivos se propone el uso de dos tarjetas de microprocesador Raspberry Pi 3B
+        (modelo a determinar en base a disponibilidad del laboratorio de robótica).
+
+        Para la emulación del centro de control se propone utilizar una instancia de EC2 de Amazon Web Services, en la que se emulará un servidor con una base de datos que utilice MySQL.
+
+    \section{Objetivos}
+
+        Los objetivos de este proyecto deben de ser vistos desde 2 esquemas cualitativos:
+        \begin{enumerate}
+            \item \textbf{Fines académicos}: Desarrollo de una primitiva criptográfica de clave pública sin hacer uso de bibliotecas de terceros para el cómputo de las claves. Aclarando que no existen limitaciones para el uso de bibliotecas que realicen de forma eficiente algunas operaciones matemáticas necesarias
+            \item \textbf{Términos ingenieriles}: Desarrollo de una arquitectura de red que permita que un conjunto de dispositivos auditores envíen lecturas de consumo y generación de energía eléctrica a un centro de control por medio de una conexión WiFi. Se parte de que los auditores tienen poder computacional bajo, y los datos generados deben de ser enviados y almacenados de forma segura.
+        \end{enumerate}
+
+        En términos cuantitativos se plantean las siguientes metas:
+        \begin{enumerate}
+            \item Costo total del dispositivo auditor menor a \textbf{100 USD} por pieza.
+            \item El tiempo de envío seguro de datos debe de ser menor a \textbf{15 minutos}, puesto que las lecturas son generadas en ventanas de tiempo de 15 minutos.
+        \end{enumerate}
+
+    \section{Arquitectura de red propuesta}
+
+        Hablar más a detalle de la arquitectura propuesta, enunciando qué componente fungirá cada papel, es como lo que el profe dice de "ponerle nombre y apellido", proponer una nomenclatura para generar identificadores únicos?
+
+        % Seguir arquitectura propuesta por el paper de ECC
+
+        % Imagen de diagrama de red propuesto
+
+        \begin{figure}[htbp]
+            \centering
+            \includegraphics[scale=0.5]{img/arquitectura_propuesta.png}
+            \label{fig:proposed_architecture}
+            \caption{Esquema de arquitectura propuesta}
+        \end{figure}
+
+        \subsection{Sumario de componentes}
+
+            \begin{table}[htbp]
+                \centering
+                % \setlength{\leftmargini}{0.4cm}
+                \scalebox{0.7}{
+                \begin{tabular}{| m{2cm} | m{3cm} | m{5cm} | m{9cm} |}
+                    \hline
+                    Nombre & Manufactura & Arranque & Producción \\
+                    \hline
+                    % -------------------------------------------------
+                    Auditor 1 / Raspberry Pi 3B &
+                    \begin{itemize}[noitemsep]
+                        \item Carga de función hash
+                        \item Contraseña pseudo-aleatoria
+                        \item Parámetro secreto $s$
+                        \item Instalación de software base
+                    \end{itemize} &
+                    \begin{itemize}[noitemsep]
+                        \item Registro de Smart Meters (esquema similar) *
+                        \item Generación de datagrama de identificación
+                        \item Envío de datos de identificación a Centro de Control
+                    \end{itemize} &
+                    \begin{itemize}[noitemsep]
+                        \item Recepción de datos de Smart Meters (lectura de datos de prueba)
+                        \item Encriptado con curva elíptica del datagrama del SmartMeter
+                        \item Pseudo-firma con función hash escogida por Centro de Control
+                    \end{itemize} \\
+                    \hline
+                    % -------------------------------------------------
+                    Auditor 2 / Raspberry Pi 3B &
+                    \begin{itemize}[noitemsep]
+                        \item Carga de función hash
+                        \item Contraseña pseudo-aleatoria
+                        \item Parámetro secreto $s$
+                        \item Instalación de software base
+                    \end{itemize} &
+                    \begin{itemize}[noitemsep]
+                        \item Registro de Smart Meters (esquema similar) *
+                        \item Generación de datagrama de identificación
+                        \item Envío de datos de identificación a Centro de Control
+                    \end{itemize} &
+                    \begin{itemize}[noitemsep]
+                        \item Recepción de datos de Smart Meters (lectura de datos de prueba)
+                        \item Encriptado con curva elíptica del datagrama del SmartMeter
+                        \item Pseudo-firma con función hash escogida por Centro de Control
+                    \end{itemize} \\
+                    \hline
+                    % -------------------------------------------------
+                    Centro de Control / EC2 Server &
+                    Adquisición de instancia de EC2 &
+                    \begin{itemize}[noitemsep]
+                        \item Selección de parámetros de curva elíptica
+                        \item Selección de función hash segura contra colisiones
+                        \item Asignación de hash de identidad para cada auditor
+                    \end{itemize} &
+                    \begin{itemize}[noitemsep]
+                        \item Recepción a los datos publicados por el auditor
+                        \item Autenticación de la identidad del auditor
+                        \item Desencriptado y preprocesamiento del datagrama recibido
+                        \item Envío de actualizaciones de software al auditor para CI/CD
+                        \item Validación física de los datos recibidos *
+                    \end{itemize} \\
+                    \hline
+                    % -------------------------------------------------
+                    Base de Datos &
+                    No aplica &
+                    Inicialización de esquema de base de datos (predefinido) &
+                    \begin{itemize}[noitemsep]
+                        \item Procesado de datos recibidos por el centro de control
+                        \item Respaldo de datos en la base de datos
+                        \item Encriptado de la base de datos
+                    \end{itemize} \\
+                    \hline
+                    % -------------------------------------------------
+                \end{tabular}}
+                \label{tab:component_summary}
+                \caption{Resumen de componentes empleados}
+            \end{table}
+
+    \section{Medio de contacto}\label{sec:contact}
+
+        El desarrollo del proyecto así como la redacción del presente documento es un trabajo conjunto de:
+        \begin{itemize}[noitemsep]
+            \item Juan Pablo Echeagaray González
+            \item Ricardo Camacho Castillo
+            \item Michelle Yareni Morales Ramóz
+            \item Emily Rebeca Méndez Cruz
+            \item Daniela García Coindreau
+            \item Carolina Longoria Lozano
+        \end{itemize}
+
+        Así mismo se destacan los siguientes profesores, como asesores y supervisores de los avances en el desarrollo del proyecto:
+        \begin{itemize}[noitemsep]
+            \item Dr. Alberto F. Martínez
+            \item Dr. Daniel Otero Fadul
+        \end{itemize}
+
+        El benefactor principal del proyecto es la organización \textit{LiCore}, la comunicación con la organización se vio llevada principalmente por el Dr. Iván S. Razo-Zapata.
+
+        En caso de encontrar fallas en el código fuente, o que se necesite de una aclaración de la implementación propuesta; se pide que se abra un \textit{issue} en el repositorio en GitHub que puede ser accedido desde la siguiente \href{https://github.com/JuanEcheagaray75/licore-pki}{liga}.
+
+    \clearpage
+    \bibliographystyle{IEEEtran}
+    \bibliography{references.bib}
 
 \end{document}
-
-% /home/mona/Pictures/logo_itesm.png
