@@ -16,3 +16,5 @@
 *.fls
 *.dvi
 
+# Python
+src/.venv
