@@ -20,5 +20,10 @@
 *.fls
 *.dvi
 
+# SSL/TLS
+*.pem
+*.key
+*.csr
+
 # General databases
 *.csv
