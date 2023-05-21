@@ -3,6 +3,8 @@
 
 # Python
 *.venv
+*.ipynb
+*.pyc
 
 # Latex
 *.aux
