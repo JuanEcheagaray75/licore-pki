@@ -2,10 +2,11 @@ import paho.mqtt.client as mqtt
 
 
 broker = "mqtt.mona-temp-test.com"
-port = 1883
+port = 8883
 
 
 client = mqtt.Client()
+client.tls_set(ca_certs="ca-root-cert.crt")
 client.connect(broker, port, 60)
 client.username_pw_set("mona", "mona")
 
