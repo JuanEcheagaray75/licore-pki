@@ -24,6 +24,9 @@
 *.pem
 *.key
 *.csr
+test_certs.zip
 
 # General databases
 *.csv
+*.txt
+*.sqlite3
