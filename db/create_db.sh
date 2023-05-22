@@ -7,8 +7,8 @@ CREATE TABLE measures(
     seq_id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     aud_id TEXT,
+    measured_timestamp DATETIME,
     measure_type INTEGER,
-    measure REAL,
-    measured_timestamp DATETIME
+    measure REAL
 );
 EOF
