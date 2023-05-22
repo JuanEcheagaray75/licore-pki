@@ -52,10 +52,10 @@ def initial_processing(data_path: str) -> pd.DataFrame:
 def main():
 
     print('Processing raw data...')
-    df = initial_processing('db/raw/Prosumer_ABC.csv')
+    df = initial_processing('../db/raw/Prosumer_ABC.csv')
 
     # Save to csv
-    df.to_csv('db/processed/Prosumer_ABC.csv', index=False)
+    df.to_csv('../db/processed/clean_prosumer.csv', index=False)
     print('Done!')
 
 
