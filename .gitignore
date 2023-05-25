@@ -23,8 +23,9 @@
 *.dvi
 
 # SSL/TLS
-*.pem
-*.key
+# TODO: REMOVE THIS BEFORE DEPLOYMENT
+# *.pem
+# *.key
 *.csr
 test_certs.zip
 
