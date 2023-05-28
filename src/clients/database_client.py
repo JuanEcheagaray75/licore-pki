@@ -104,14 +104,14 @@ tls_sets = {'ca_certs':"../.test_certs/ca-root-cert.crt",
             'certfile':"../.test_certs/database_licore.crt",
             'keyfile':"../.test_certs/database_licore.key"}
 
-test_message = 'hello auditor'
+test_message = 'Parameter Update: Testing'
 signature = database_key.sign(
         test_message.encode('utf-8'),
         ECDSA(BLAKE2b(64))
     )
 packet = test_message + "||" + signature.hex()
 
-single(topic='control_center/updates/database_licore',
+single(topic='control_center/updates/auditor_mona/database_licore',
        payload=packet, qos=0,
        hostname=broker, port = port,
        tls=tls_sets, retain=True)

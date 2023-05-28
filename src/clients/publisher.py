@@ -8,6 +8,15 @@ from cryptography.x509.oid import NameOID
 from utils import create_packets, load_cert_pub_priv
 
 
+# GENERAL PARAMETERS
+broker = "mqtt.mona-temp-test.com"
+port = 8883
+dev_name = 'auditor_mona'
+auditor_cert, auditor_pub, auditor_key = load_cert_pub_priv(dev_name)
+id = auditor_cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
+
+
+
 # TODO: Change this name accordingly, for dev purposes we use
 # the python database client script to test the general sending
 # of parameter updates.
@@ -15,7 +24,7 @@ CONTROL_CENTER_NAME = 'database_licore'
 
 def on_connect(client, userdata, flags, rc):
     print("Connected through MQTT " + str(rc))
-    client.subscribe("control_center/updates/#", qos=0)
+    client.subscribe(f"control_center/updates/{dev_name}/#", qos=0)
 
 
 def on_message(client: mqtt, userdata, msg):
@@ -31,7 +40,7 @@ def on_message(client: mqtt, userdata, msg):
     """
 
     received_message = msg.payload.decode('utf-8')
-    user_id = msg.topic.split('/')[2]
+    user_id = msg.topic.split('/')[3]
     packet = received_message.split('||')[0]
     signature = bytes.fromhex(received_message.split('||')[-1])
 
@@ -52,12 +61,6 @@ def on_message(client: mqtt, userdata, msg):
             raise Exception('Invalid signature')
 
 
-# GENERAL PARAMETERS
-broker = "mqtt.mona-temp-test.com"
-port = 8883
-dev_name = 'auditor_mona'
-auditor_cert, auditor_pub, auditor_key = load_cert_pub_priv(dev_name)
-id = auditor_cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
 
 # Client setup
@@ -91,7 +94,7 @@ for packet in packets:
     payload = packet + '||' + signature.hex()
     client.publish(topic=f'audits/measures/{id}',
                    payload=payload,
-                   qos=2)
+                   qos=0)
 
     print(f'Packet {packet} published')
     sleep(0.2)
