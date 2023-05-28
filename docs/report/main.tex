@@ -257,16 +257,24 @@
                 Las curvas elípticas son utilizadas para la reducción de la complejidad de un algoritmo en los métodos más empleados de la criptografía. La criptografía de curva elíptica es utilizada cada vez más en la práctica para protocolos de criptografía de clave pública, su utilidad es principalmente debido a sus características matemáticas de curvas elípticas planas \cite{sanchez2021solucion}.
 
                 La criptografía de curvas elípticas es una variante de la criptografía asimétrica, esta cuenta con una llave pública y otra privada con la que se descifra el mensaje. Una de sus ventajas es que cuenta con una mayor velocidad a comparación de los otros algoritmos de cifrado asimétrico, además de usar claves más cortas con un tamaño mínimo recomendado por la NIST de 160 bits para CCE en comparación con 1024 bits para los algoritmos RSA y DSA \cite{ramirez2018sistemas}. Esta reducción al tamaño de las claves de bits intercambiadas entre entidades se debe a la aplicación de la sucesión matemática que se muestra a continuación:
-                \begin{gather*}
-                    E:y^2=x^3 + ax + b \\
-                    \text{donde $a$ y $b$ son números enteros que satisfacen }\\
+                \begin{equation}
+                    E:y^2=x^3 + ax + b
+                \end{equation}
+                Donde $a$ y $b$ son números enteros que satisfacen
+                \begin{equation}
                     4a^3 + 27b^2 \neq 0
-                \end{gather*}
+                \end{equation}
 
-                Sobre campos finitos primos $F(q)$, seleccionando dos puntos enteros de la curva $P$ y $Q$ que cumplan que $P+Q=R$, siendo $R$ el punto inverso de intersección entre los dos puntos anteriores. Esto produce una suma
+                Sobre campos finitos primos $F(q)$, seleccionando dos puntos enteros de la curva $P$ y $Q$ que cumplan que $P+Q=R$, siendo $R$ el punto inverso de intersección entre los dos puntos anteriores. Esto produce una suma repetida de puntos $P$, de tal forma que se considerará $Q=P+P+...+P$; al emplear esta sucesión matemática se reduce considerablemente el tamaño de las claves de bits intercambiadas. Una clave de ECC de 224 bits brinda una seguridad semejante a una clave RSA de 2048 bits, esto permite una mayor eficiencia en la transmisión de información \cite{sanchez2021solucion}.
 
             \subsubsection{BLAKE2}
 
+                BLAKE2b, simplemente conocido como BLAKE2 fue diseñado por un equipo de expertos en criptoanálisis, implementación e ingeniería criptográfica; miembros de ese equipo son, Jean-Philippe Aumasson, Samuel Neves, Zooko Wilcox-O'Hearn y Christian Winnerlein. BLAKE2 es una función hash criptográfica basada en el cifrado de flujo ChaCha. Sin embargo, en BLAKE2 se agrega una copia permutada del bloque de entrada, XORed con constantes de ronda, antes de cada ronda de ChaCha. BLAKE2 está optimizado para plataformas de 64 bits y produce resúmenes de cualquier tamaño entre 1 y 64 bytes. Una característica clave del algoritmo BLAKE2 es que este no requiere una construcción especial "HMAC", es decir, la construcción de un código de autenticación de mensaje hash para la autenticación de mensajes con clave, ya que este tiene un mecanismo de clave incorporado. Además, BLAKE2 puede ser utilizado en algoritmos de firma digital y autenticación de mensajes y mecanismos de protección de integridad en aplicaciones tales como infraestructura de clave pública (PKI), almacenamiento en la nube, detección de intrusos, suites forenses, sistemas de control de versiones y protocolos de comunicación segura. \cite{BLAKE2_2017}.
+
+            \subsubsection{ECDSA con BLAKE2}
+
+                Normalmente, las funciones hash SHA se utilizan en diversas aplicaciones y criptografía de clave pública, sin embargo, SHA tiene 80 iteraciones diferentes las cuales consumen energía del dispositivo inteligente. Por esta razón se opta por usar una función hash más ligera basada en BLAKE2.  BLAKE2 usa 8 rondas de permutaciones y combinaciones para producir el resumen del mensaje de 256/512 bits. Se ha visto en un estudio que esta reducción en el cómputo ha atraído a los investigadores a utilizar las funciones de hash de BLAKE2 para diversas aplicaciones. A través de varios experimentos realizados en diferentes sistemas operativos, se ha demostrado que BLAKE2 tiene una mejor eficiencia computacional que la familia SHA de funciones hash para el esquema basado en ECDSA en diferentes sistemas operativos. \cite{9031038}.
+                
             \subsubsection{MQTT}
 
         \subsection{Sumario de componentes}
