@@ -208,7 +208,8 @@
             Una vez que se ha establecido un secreto en común entre 2 entes se puede aplicar alguna de las técnicas de encriptado simétrico que conocemos; esta suele ser una de las partes más sencillas de cualquier protocolo criptográfico ya que suele ser computacionalmente eficiente y rápido de calcular para evitar problemas de latencia en los procesos de comunicación.
 
             En \cite{el2018analysis} se realizó una comparativa de los algoritmos de cifrado DES, 3DES, AES128, AES192 y AES256. Una conclusión esperada era que los algoritmos de la clase DES tuvieran una huella reducida a comparación de la suite de AES; a pesar de que su estudio confirma el supuesto, el NIST tiene registros de vulnerabilidades de este algoritmo desde el 2016 \cite{des_vulnerable}.
-        \subsection{Firma digital}
+
+        \subsection{Funciones Hash}
 
             Una parte fundamental de los algoritmos de encriptado descritos es la función \textit{hash}. La principal aportación de este componente es que brinda la habilidad de que un destinatario se asegure de que el mensaje que haya recibido no ha sido modificado en el transcurso de su envío.
 
@@ -218,11 +219,11 @@
 
             En \cite{rao2019comparative} se realiza un estudio similar al anterior, pero enfocado a la función hash necesaria para el firmado con curvas elípticas. Su conjunto de pruebas consistió en parte de las mismas funciones anteriores en añadidura de HAVAL, KECCAK, y BLAKE. El estudio encontró que la familia SHA es de las mejores disponibles, pero es sobrepasada por la función hash BLAKE en cuanto a uso en curvas elípticas concierne.
 
-        \subsection{Protocolos criptográficos}
+        \subsection{Protocolos de comunicación}
 
             Al final del día las funciones y componentes mencionadas representan partes estrictamente aisladas del protocolo criptográfico a implementar para asegurar las conexiones en la red propuesta. Es por eso que después se proponen mezclas y técnicas que implementan los algoritmos criptográficos base que después son acotados y personalizados a diferentes casos de estudio.
 
-            En \cite{abreu2020identity} se propone un enfoque similar a arquitecturas cliente-servidor, en el que se envían datos por medio de HTTPS haciendo uso de TLS para asegurar las vías de comunicación. El estudio propuso una arquitectura que necesita de menos mensajes para asegurar un canal de comunicación, pero que no logra concretar una política de acceso detallada basada en los recursos a los cuales se desea acceder y/o modificar.
+            En \cite{abreu2020identity} se propone un enfoque similar a arquitecturas cliente-servidor, en el que se envían datos por medio de HTTPS haciendo uso de TLS para asegurar las vías de comunicación. El estudio propuso una arquitectura que necesita de menos mensajes para asegurar un canal de comunicación, pero que no logra concretar una política de acceso  detallada basada en los recursos a los cuales se desea acceder y/o modificar.
 
             En \cite{lohachab2019ecc} se propone un esquema ligero que no utiliza el concepto de certificados para el proceso de autenticación y autorización, para ser remplazados por un esquema de comunicación sobre MQTT incluyendo \textit{hasheo} con firmado de claves públicas generadas de forma local, sin que se incurra en un alto consumo energético o que se añada una latencia descomunal al proceso de comunicación.
 
@@ -235,11 +236,7 @@
 
     \section{Objetivos}
 
-        Los objetivos de este proyecto deben de ser vistos desde 2 esquemas cualitativos:
-        \begin{enumerate}
-            \item \textbf{Fines académicos}: Desarrollo de una primitiva criptográfica de clave pública sin hacer uso de bibliotecas de terceros para el cómputo de las claves. Aclarando que no existen limitaciones para el uso de bibliotecas que realicen de forma eficiente algunas operaciones matemáticas necesarias
-            \item \textbf{Términos ingenieriles}: Desarrollo de una arquitectura de red que permita que un conjunto de dispositivos auditores envíen lecturas de consumo y generación de energía eléctrica a un centro de control por medio de una conexión WiFi. Se parte de que los auditores tienen poder computacional bajo, y los datos generados deben de ser enviados y almacenados de forma segura.
-        \end{enumerate}
+        El objetivo principal de este proyecto es el desarrollo de una arquitectura de red que permita que un conjunto de dispositivos auditores envíen lecturas de consumo y generación de energía eléctrica a un centro de control por medio de una conexión WiFi. Se parte de que los auditores tienen poder computacional bajo, y los datos generados deben de ser enviados y almacenados de forma segura.
 
         En términos cuantitativos se plantean las siguientes metas:
         \begin{enumerate}
@@ -247,100 +244,139 @@
             \item El tiempo de envío seguro de datos debe de ser menor a \textbf{15 minutos}, puesto que las lecturas son generadas en ventanas de tiempo de 15 minutos.
         \end{enumerate}
 
-    \section{Arquitectura de red propuesta}
+    \section{Arquitectura propuesta}
 
-        Hablar más a detalle de la arquitectura propuesta, enunciando qué componente fungirá cada papel, es como lo que el profe dice de "ponerle nombre y apellido", proponer una nomenclatura para generar identificadores únicos?
+        En base a la investigación realizada así como a las comparativas del desempeño de los diferentes algoritmos criptográficos y los requisitos monetarios impuestos por el Socio Formador; se propone un esquema criptográfico adaptado de \cite{lohachab2019ecc}. Nuestra propuesta aprovecha el tamaño de llave reducido de curvas elípticas así como la rapidez con la que se pueden aplicar la función BLAKE-2 en dispositivos Raspberry Pi 3B.
 
-        % Seguir arquitectura propuesta por el paper de ECC
+        En esta sección se presenta la arquitectura propuesta, así como los elementos que la conforman y el modelado del sistema. Se partirá con una explicación detallada de los fundamentos matemáticos de ECDSA así como del protocolo de comunicación MQTT; posteriormente se presentará un listado de los componentes de la red propuesta, así como una descripción de las tareas que realizarán en cada una de las etapas de manufactura, arranque y producción.
 
-        % Imagen de diagrama de red propuesto
+        \subsection{Preliminares}
 
-        \begin{figure}[htbp]
-            \centering
-            \includegraphics[scale=0.5]{img/arquitectura_propuesta.png}
-            \label{fig:proposed_architecture}
-            \caption{Esquema de arquitectura propuesta}
-        \end{figure}
+            \subsubsection{Curvas Elípticas}
+
+                Las curvas elípticas son utilizadas para la reducción de la complejidad de un algoritmo en los métodos más empleados de la criptografía. La criptografía de curva elíptica es utilizada cada vez más en la práctica para protocolos de criptografía de clave pública, su utilidad es principalmente debido a sus características matemáticas de curvas elípticas planas \cite{sanchez2021solucion}.
+
+                La criptografía de curvas elípticas es una variante de la criptografía asimétrica, esta cuenta con una llave pública y otra privada con la que se descifra el mensaje. Una de sus ventajas es que cuenta con una mayor velocidad a comparación de los otros algoritmos de cifrado asimétrico, además de usar claves más cortas con un tamaño mínimo recomendado por la NIST de 160 bits para CCE en comparación con 1024 bits para los algoritmos RSA y DSA \cite{ramirez2018sistemas}. Esta reducción al tamaño de las claves de bits intercambiadas entre entidades se debe a la aplicación de la sucesión matemática que se muestra a continuación:
+                \begin{gather*}
+                    E:y^2=x^3 + ax + b \\
+                    \text{donde $a$ y $b$ son números enteros que satisfacen }\\
+                    4a^3 + 27b^2 \neq 0
+                \end{gather*}
+
+                Sobre campos finitos primos $F(q)$, seleccionando dos puntos enteros de la curva $P$ y $Q$ que cumplan que $P+Q=R$, siendo $R$ el punto inverso de intersección entre los dos puntos anteriores. Esto produce una suma
+
+            \subsubsection{BLAKE2}
+
+            \subsubsection{MQTT}
 
         \subsection{Sumario de componentes}
 
+            En la tabla \ref{tab:component_summary} se presenta un resumen general de cada uno de los componentes necesitados para el desarrollo del proyecto, acompañados de una descripción concisa de las tareas que realizarán en las etapas de manufactura, arranque y producción.
+
             \begin{table}[htbp]
                 \centering
-                % \setlength{\leftmargini}{0.4cm}
-                \scalebox{0.7}{
-                \begin{tabular}{| m{2cm} | m{3cm} | m{5cm} | m{9cm} |}
+                \scalebox{0.8}{
+                \begin{tabular}{| m{2cm} | m{4cm} | m{4cm} | m{8cm} |}
                     \hline
                     Nombre & Manufactura & Arranque & Producción \\
                     \hline
                     % -------------------------------------------------
-                    Auditor 1 / Raspberry Pi 3B &
-                    \begin{itemize}[noitemsep]
-                        \item Carga de función hash
-                        \item Contraseña pseudo-aleatoria
-                        \item Parámetro secreto $s$
+                    Auditores (Raspberry Pi 3B) &
+                    \begin{itemize}[noitemsep, leftmargin=*]
                         \item Instalación de software base
+                        \item Instalación de certificado de fábrica
                     \end{itemize} &
-                    \begin{itemize}[noitemsep]
-                        \item Registro de Smart Meters (esquema similar) *
-                        \item Generación de datagrama de identificación
-                        \item Envío de datos de identificación a Centro de Control
+                    \begin{itemize}[noitemsep, leftmargin=*]
+                        \item Registro de Smart Meters (esquema similar)
+                        \item Carga del certificado propio, del Centro de Control y la CA
+                        \item Conexión al Broker mediante TLS
                     \end{itemize} &
-                    \begin{itemize}[noitemsep]
+                    \begin{itemize}[noitemsep, leftmargin=*]
                         \item Recepción de datos de Smart Meters (lectura de datos de prueba)
-                        \item Encriptado con curva elíptica del datagrama del SmartMeter
-                        \item Pseudo-firma con función hash escogida por Centro de Control
+                        \item Firmado de tramas con ECDSA
+                        \item Recepción y procesamiento de ajustes de parámetros del Centro de Control
                     \end{itemize} \\
                     \hline
                     % -------------------------------------------------
-                    Auditor 2 / Raspberry Pi 3B &
-                    \begin{itemize}[noitemsep]
-                        \item Carga de función hash
-                        \item Contraseña pseudo-aleatoria
-                        \item Parámetro secreto $s$
+                    Mosquitto Broker (EC2) &
+                    \begin{itemize}[noitemsep, leftmargin=*]
+                        \item Instalación de Mosquitto Broker
+                        \item Sobre-escritura de archivo de configuración de Mosquitto
+                        \item Instalación de certificado propio
+                    \end{itemize} &
+                    Establecimiento de conexión TLS entre cada cliente &
+                    \begin{itemize}[noitemsep, leftmargin=*]
+                        \item Recepción de tramas en tópicos permitidos
+                        \item Reenvío de tramas de auditores hacia el Centro de Control y viceversa
+                    \end{itemize} \\
+                    \hline
+                    % -------------------------------------------------
+                    Centro de Control (Laptop) &
+                    \begin{itemize}[noitemsep, leftmargin=*]
+                        \item Creación de certificados para auditores, Broker y sí mismo, estableciendo al Broker como CA
+                        \item Creación de base de datos de sqlite3
+                    \end{itemize} &
+                    \begin{itemize}[noitemsep, leftmargin=*]
                         \item Instalación de software base
+                        \item Instalación de certificado propio, de la CA, y cada auditor
+                        \item Conexión al Broker mediante TLS
                     \end{itemize} &
-                    \begin{itemize}[noitemsep]
-                        \item Registro de Smart Meters (esquema similar) *
-                        \item Generación de datagrama de identificación
-                        \item Envío de datos de identificación a Centro de Control
-                    \end{itemize} &
-                    \begin{itemize}[noitemsep]
-                        \item Recepción de datos de Smart Meters (lectura de datos de prueba)
-                        \item Encriptado con curva elíptica del datagrama del SmartMeter
-                        \item Pseudo-firma con función hash escogida por Centro de Control
-                    \end{itemize} \\
-                    \hline
-                    % -------------------------------------------------
-                    Centro de Control / EC2 Server &
-                    Adquisición de instancia de EC2 &
-                    \begin{itemize}[noitemsep]
-                        \item Selección de parámetros de curva elíptica
-                        \item Selección de función hash segura contra colisiones
-                        \item Asignación de hash de identidad para cada auditor
-                    \end{itemize} &
-                    \begin{itemize}[noitemsep]
-                        \item Recepción a los datos publicados por el auditor
-                        \item Autenticación de la identidad del auditor
-                        \item Desencriptado y preprocesamiento del datagrama recibido
-                        \item Envío de actualizaciones de software al auditor para CI/CD
-                        \item Validación física de los datos recibidos *
-                    \end{itemize} \\
-                    \hline
-                    % -------------------------------------------------
-                    Base de Datos &
-                    No aplica &
-                    Inicialización de esquema de base de datos (predefinido) &
-                    \begin{itemize}[noitemsep]
-                        \item Procesado de datos recibidos por el centro de control
-                        \item Respaldo de datos en la base de datos
-                        \item Encriptado de la base de datos
+                    \begin{itemize}[noitemsep, leftmargin=*]
+                        \item Recepción de tramas firmadas de auditores
+                        \item Verificación y firmas para escritura en la base de datos si la verificación es exitosa
+                        \item Envío de actualizaciones de parámetros a los auditores
                     \end{itemize} \\
                     \hline
                     % -------------------------------------------------
                 \end{tabular}}
-                \label{tab:component_summary}
                 \caption{Resumen de componentes empleados}
+                \label{tab:component_summary}
             \end{table}
+
+            Se aclara que que el Centro de Control deberá ser remplazado por una máquina distinta, el equipo recomienda el uso de otra instancia de EC2 con un mayor poder computacional que pueda procesar todas las tramas concurrentes de los auditores.
+
+        \subsection{Arquitectura de red}
+
+            En la figura \ref{fig:proposed_architecture} se presenta el esquema general de cómo se vería la red de auditores.
+
+            \begin{figure}[htbp]
+                \centering
+                \includegraphics[scale=0.7]{proposed_architecture.png}
+                \caption{Esquema de arquitectura propuesta}
+                \label{fig:proposed_architecture}
+            \end{figure}
+
+            En la figura se maneja un código de colores para representar el tipo de comunicación existente entre cada dispositivo:
+            \begin{itemize}[noitemsep, leftmargin=*]
+                \item Flecha Azul: Canal cifrado con TLS
+                \item Flecha Gris: Canal sin protección con envío de datos en texto plano
+                \item Recuadro Naranja: Entorno ajeno al Socio Formador
+                \item Recuadro Verde: Entorno seguro manejado por el Socio Formador
+            \end{itemize}
+
+            Se ha realizado una distinción entre la red que comunica a cada auditor y la red del Socio Formador, puesto que se considera necesario implementar medidas de seguridad extra para asegurarse de que las mediciones de los Smart Meters lleguen sin alteraciones a sus respectivos auditores.
+
+            El equipo no ha desarrollado software especializado para manejar esta situación puesto que no se dispuso de información alguna del tipo de dispositivos que generan estas mediciones.
+
+        \subsection{Funcionamiento}
+
+            1. \textbf{Fase de regitro}: El Centro de Control $CC$ crea certificados para todos los auditores $A_i$, el Broker $B$ y para sí mismo. Se establece como CA a $B$.
+
+            2. \textbf{Envío de certificados}: $CC$ distribuye todos los certificados a cada uno de los clientes. Para el caso de $B$ se debe de seguir la guía de configuración propuesta en nuestra \href{https://github.com/JuanEcheagaray75/licore-pki/blob/master/src/.test_certs/README.md}{guía de certificados}.
+
+            3. \textbf{Inicio de procesos}: se debe programar la corrida de los scripts \texttt{publisher.py} y \texttt{database\_client.py} provistos. Para nuestra demostración se dejarán corriendo desde que inicien a operar.
+
+            Cada auditor solamente podrá publicar mensajes en el tópico \texttt{audits/measures/ID\_i}, y se suscribirá al tópico \texttt{control\_center/updates/ID\_i/\#}.
+
+            4. \textbf{Carga de certificados propios}: Cada auditor $A_i$ cargará su certificado, llave privada y llave pública en memoria. El $CC$ realiza esta misma operación.
+
+            5. \textbf{Conexión con broker}: Cada auditor $A_i$ y el $CC$ se conectarán a $B$ enviando sus certificados. El broker determinará la validez de los mismos y determinará si se establece una conexión.
+
+            6. \textbf{Envío de tramas}: Cada auditor $A_i$ dispone de su identificador $ID_i$, la fecha de medición $d$, el tipo de medición $t$ y el valor numérico observado $x$, se envía entonces un paquete como: $P = ID_i \backslash d \backslash t \backslash x$. Dicha trama es firmada utilizando la llave privada $K_i$, siendo el paquete final $P_f = Sign(P, K_i) || P$. Dicho paquete será publicado en el tópico del auditor antes siendo encriptado por la conexión TLS establecida.
+
+            7. \textbf{Autenticación de tramas}: $CC$ verifica el paquete recibido haciendo uso de la clave pública $Pub_i$ de $A_i$, si $Verify(Sign(P, K_i), Pub_i)$ produce un resultado válido, la trama $P$ será guardada en la base de datos.
+
+            8. \textbf{Actualización de parámetros}: $CC$ puede realizar un proceso similar para alterar el funcionamiento de $A_i$, deberá repetir los pasos 3 a 7 para enviar una actualización válida a través del tópico \texttt{control\_center/updates/ID\_i/\#}
 
     \section{Medio de contacto}\label{sec:contact}
 
@@ -363,6 +399,8 @@
         El benefactor principal del proyecto es la organización \textit{LiCore}, la comunicación con la organización se vio llevada principalmente por el Dr. Iván S. Razo-Zapata.
 
         En caso de encontrar fallas en el código fuente, o que se necesite de una aclaración de la implementación propuesta; se pide que se abra un \textit{issue} en el repositorio en GitHub que puede ser accedido desde la siguiente \href{https://github.com/JuanEcheagaray75/licore-pki}{liga}.
+
+        Para dudas generales sobre el proyecto, se puede contactar a Juan Pablo Echeagaray González, al correo \href{mailto:a00830646@tec.mx}{a00830646@tec.mx}
 
     \clearpage
     \bibliographystyle{IEEEtran}
