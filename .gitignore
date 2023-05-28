@@ -23,13 +23,13 @@
 *.dvi
 
 # SSL/TLS
-# TODO: REMOVE THIS BEFORE DEPLOYMENT
-# *.pem
-# *.key
+*.pem
+*.key
 *.csr
 test_certs.zip
 
 # General databases
+# TODO: REMOVE THIS BEFORE DEPLOYMENT
 *.csv
 *.txt
 *.sqlite3
