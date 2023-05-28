@@ -5,18 +5,8 @@ from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ec import ECDSA
 from cryptography.hazmat.primitives.hashes import BLAKE2b
 from cryptography.x509 import load_pem_x509_certificate
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.x509.oid import NameOID
-
-
-# Load Certificates
-with open('../.test_certs/database_licore.key', 'rb') as f:
-    database_key = load_pem_private_key(f.read(), password=None)
-
-with open('../.test_certs/database_licore.crt', 'rb') as f:
-    database_cert = load_pem_x509_certificate(f.read())
-    pub_key = database_cert.public_key()
-
+from utils import load_cert_pub_priv
 
 
 def write_to_db(db_path: str, packet: list) -> None:
@@ -94,6 +84,8 @@ def on_message(client: mqtt, userdata, msg):
 # GENERAL PARAMETERS
 broker = "mqtt.mona-temp-test.com"
 port = 8883
+dev_name = 'database_licore'
+database_cert, database_pub, database_key = load_cert_pub_priv(dev_name)
 id = database_cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
 

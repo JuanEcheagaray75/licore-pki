@@ -3,25 +3,15 @@ from time import sleep
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ec import ECDSA
 from cryptography.hazmat.primitives.hashes import BLAKE2b
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.x509.oid import NameOID
-from utils import create_packets
+from utils import create_packets, load_cert_pub_priv
 
 
 # TODO: Change this name accordingly, for dev purposes we use
 # the python database client script to test the general sending
 # of parameter updates.
 CONTROL_CENTER_NAME = 'database_licore'
-
-# Load Certificates
-with open('../.test_certs/auditor_mona.key', 'rb') as f:
-    auditor_key = load_pem_private_key(f.read(), password=None)
-
-with open('../.test_certs/auditor_mona.crt', 'rb') as f:
-    auditor_cert = load_pem_x509_certificate(f.read())
-    pub_key = auditor_cert.public_key()
-
 
 def on_connect(client, userdata, flags, rc):
     print("Connected through MQTT " + str(rc))
@@ -65,6 +55,8 @@ def on_message(client: mqtt, userdata, msg):
 # GENERAL PARAMETERS
 broker = "mqtt.mona-temp-test.com"
 port = 8883
+dev_name = 'auditor_mona'
+auditor_cert, auditor_pub, auditor_key = load_cert_pub_priv(dev_name)
 id = auditor_cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
 
