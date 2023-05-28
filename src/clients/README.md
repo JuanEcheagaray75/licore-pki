@@ -4,7 +4,7 @@ The present directory hosts the available python scripts that interact with the 
 
 Each of the clients will share some pre-requisites, which are listed below.
 
-- The organization must have created and sent the appropriate certificates to the corresponding clients. Follow the guide provided in the [.test_certs README](../.test_certs/README.md)
+- The organization must have created and sent the appropriate certificates to the corresponding clients. Follow the guide provided in the [Certificate Creation Guide](../.test_certs/README.md)
 - Each client must have a Python 3 installation, as of now every Linux distribution comes with Python 3 pre-installed.
 
 ## Publisher
