@@ -2,6 +2,8 @@
 
 As of the development of this project, the MQTT broker used is [Mosquitto](https://mosquitto.org/). The following commands were used to generate the certificates used by the broker and the clients. The following commands are meant to be run in the EC2 instance used to host the broker. The certificates are generated using the [OpenSSL](https://www.openssl.org/) toolkit.
 
+Although the certificates are created in the EC2 instance hosting the Mosquitto Broker, one can easily create every needed file in the Control Center and then use `scp` to copy them to the EC2 instance.
+
 For ease of development we recommend first creating all the below mentioned certificates into a test directory and then moving them to the appropriate location. This policy does not apply to a production environment.
 
 - [Certificate generation](#certificate-generation)

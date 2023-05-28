@@ -62,4 +62,4 @@ require_certificate true
 use_identity_as_username true
 ```
 
-As you can see from the previous text snippet, we need to install the specific certificates and keys into the previous directories. By this step the Control Center must have already created them. If not, please check the Control Center section.
+As you can see from the previous text snippet, we need to install the specific certificates and keys into the previous directories. By this step the Control Center must have already created them. If not, please check the documentation on the [Certificate Creation Guide](../.test_certs/README.md)
