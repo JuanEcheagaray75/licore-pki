@@ -13,6 +13,35 @@
 \usepackage{tabularx}
 \usepackage{csquotes}
 \usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    basicstyle=\linespread{0.8}\ttfamily
+}
+
+\lstset{style=mystyle}
 
 \decimalpoint
 \renewcommand{\baselinestretch}{1.5}
@@ -274,8 +303,16 @@
             \subsubsection{ECDSA con BLAKE2}
 
                 Normalmente, las funciones hash SHA se utilizan en diversas aplicaciones y criptografía de clave pública, sin embargo, SHA tiene 80 iteraciones diferentes las cuales consumen energía del dispositivo inteligente. Por esta razón se opta por usar una función hash más ligera basada en BLAKE2.  BLAKE2 usa 8 rondas de permutaciones y combinaciones para producir el resumen del mensaje de 256/512 bits. Se ha visto en un estudio que esta reducción en el cómputo ha atraído a los investigadores a utilizar las funciones de hash de BLAKE2 para diversas aplicaciones. A través de varios experimentos realizados en diferentes sistemas operativos, se ha demostrado que BLAKE2 tiene una mejor eficiencia computacional que la familia SHA de funciones hash para el esquema basado en ECDSA en diferentes sistemas operativos. \cite{9031038}.
-                
+
             \subsubsection{MQTT}
+
+                El protocolo MQTT (Message Queue Telemetry Transport) es un protocolo de publicación-suscripción, este facilita la conexión a una gran cantidad de dispositivos y además tiene cierta facilidad para comprobar que el mensaje llegue al objetivo proporcionando una seguridad mediante certificados electrónicos \cite{lliso2021uso}. Este protocolo de mensajería asíncrona es utilizado en el ámbito de las comunicaciones machine-to-machine (M2M) en el campo de IoT \cite{mahedero2020desarrollo}.
+
+                El modelo publicación y suscripción funciona mediante la conexión a un broker por parte de los clientes. Para el envío de mensajes y para su posterior recepción, ambos se suscriben a un topic donde se disponen los mensajes, convirtiendo este modelo en un modelo no-bloqueante. Un cliente MQTT es tanto los suscriptores como los publicadores, un cliente MQTT puede ser un suscriptor, publicador o ambos a la vez \cite{mahedero2020desarrollo}.
+
+                El broker MQTT es el servidor encargado de la distribución de los mensajes a los receptores; este recibe los mensajes, realiza un chequeo del topic al que están suscritos y los encamina hacia los clientes suscritos a este mismo topic. El broker brinda la posibilidad que se guarden los mensajes hasta que el cliente al que va dirigido se conecte. Otra función que tiene el broker es la de autentificar la identidad de los clientes como medida de seguridad \cite{mahedero2020desarrollo}.
+
+                El tópico, el tema del mensaje, sirve como identificador al broker para poder dirigir cada uno de los mensajes recibidos hacia los clientes adecuados que estén suscritos al topic \cite{mahedero2020desarrollo}.
 
         \subsection{Sumario de componentes}
 
@@ -385,6 +422,53 @@
             7. \textbf{Autenticación de tramas}: $CC$ verifica el paquete recibido haciendo uso de la clave pública $Pub_i$ de $A_i$, si $Verify(Sign(P, K_i), Pub_i)$ produce un resultado válido, la trama $P$ será guardada en la base de datos.
 
             8. \textbf{Actualización de parámetros}: $CC$ puede realizar un proceso similar para alterar el funcionamiento de $A_i$, deberá repetir los pasos 3 a 7 para enviar una actualización válida a través del tópico \texttt{control\_center/updates/ID\_i/\#}
+
+    \section{Implementación y resultados}
+
+        Para probar el código que se ha desarrollado se ha de ejecutar los siguientes comandos en una terminal de Linux:
+        \begin{lstlisting}[language=bash]
+            $ git clone https://github.com/JuanEcheagaray75/licore-pki
+            # Instalar certificados y llaves privadas provistas por separado
+            $ cd licore-pki/db
+            $ ./create_db.sh
+            $ cd ../src
+            $ python3 -m venv .venv
+            $ source .venv/bin/activate
+            $ pip install -r requirements.txt
+            $ cd clients
+            # Correr en laptop
+            $ python3 database_client.py
+            # Correr en Raspberry Pi
+            $ python3 publisher.py
+            # Probar actualizacion de base de datos
+            $ sqlite3 ../db/measures.sqlite3; select * from measures;
+        \end{lstlisting}
+
+        Para demostrar el funcionamiento del código se ha propuesto limitar el número de mensajes a enviar a 20. En la figura \ref{fig:db_client} se muestra el procesamiento de dichos 20 mensajes; para que estos sean procesados fue necesario que la firma del auditor fuera válida y que el mensaje no hubiera sido procesado previamente.
+        \begin{figure}[!htbp]
+            \centering
+            \includegraphics[scale=0.5]{database_client.png}
+            \caption{Cliente de base de datos en Centro de Control}
+            \label{fig:db_client}
+        \end{figure}
+
+        En la figura \ref{fig:auditor} se muestra el auditor emulado como un Raspberry PI 3B en VirtualBox enviando mensajes al broker. Se puede observar que el auditor se suscribe al tópico \texttt{control\_center/updates/ID\_i/\#} y que publica mensajes en el tópico \texttt{audits/measures/ID\_i}.
+
+        El auditor envía por defecto una trama cada 0.2 segundos, notamos también que al final se reportó un periodo de procesamiento de 9.57 segundos para los 20 mensajes enviados, siendo un tiempo de procesamiento por mensaje promedio de 0.478 segundos.
+        \begin{figure}[!htbp]
+            \centering
+            \includegraphics[scale=0.6]{publisher.png}
+            \caption{Auditor publicando mensajes}
+            \label{fig:auditor}
+        \end{figure}
+
+        Finalmente se comprueba que los mensajes fueron creados y procesados exitosamente al consultar la base de datos, como se muestra en la figura \ref{fig:db}.
+        \begin{figure}[!htbp]
+            \centering
+            \includegraphics[scale=0.5]{database.png}
+            \caption{Base de datos con mensajes procesados}
+            \label{fig:db}
+        \end{figure}
 
     \section{Medio de contacto}\label{sec:contact}
 
