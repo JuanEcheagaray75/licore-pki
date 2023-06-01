@@ -9,7 +9,7 @@
   - [Project Summary](#project-summary)
   - [Appendix](#appendix)
     - [Prerequisites](#prerequisites)
-    - [Credits](#credits)
+    - [Authors](#authors)
     - [License](#license)
 
 ## Problem Statement
@@ -54,9 +54,20 @@ Addressing these challenges is critical to ensuring the confidentiality, integri
   - Create EC2 instance
   - Add public ip address of EC2 instance to a new record in Route 53
 
-### Credits
+### Authors
 
 [(Back to top)](#table-of-contents)
+
+The present project was a collaboration between the following authors:
+
+1. Juan Pablo Echeagaray González, [contact](mailto:a00830646@tec.mx)
+2. Ricardo Camacho Castillo
+3. Michelle Yareni Morales Ramón
+4. Emily Rebeca Méndez Cruz
+5. Daniela García Coindreau
+6. Carolina Longoria Lozano
+
+Please contact Juan Pablo Echeagaray González for any questions or comments.
 
 ### License
 
