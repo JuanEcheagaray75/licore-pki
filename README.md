@@ -38,6 +38,18 @@ Addressing these challenges is critical to ensuring the confidentiality, integri
 
 [(Back to top)](#table-of-contents)
 
+The project established a secure MQTT connection between auditors, a Mosquitto Broker hosted on an EC2 instance and an end client hosted in a personal laptop. To ensure the confidentiality, integrity, and authenticity of the transmitted data, TLS encryption and ECDSA signatures were implemented. Auditors generated ECDSA signatures for their messages, which were verified by the end client (and vice versa) using their corresponding public keys. This process ensured that only authenticated auditors could establish a connection and exchange data securely. The following diagram illustrates the overall architecture of the system:
+
+| <img src='docs/report/img/proposed_architecture.png' width='800'> |
+| :---------------------------------------------------------------: |
+| *Figure 2: Proposed architecture for the secure MQTT connection*  |
+
+In addition to the authentication mechanism, TLS encryption was employed to secure the communication channels. This encryption technology provided end-to-end encryption, protecting the confidentiality of the data transmitted between the auditors, the Mosquitto Broker and the end client. It prevented unauthorized access and eavesdropping, ensuring that sensitive information remained confidential. Furthermore, the end client implemented a validation process that processed only messages with valid ECDSA signatures. This ensured the integrity of the data stored in the client's database, enhancing the overall trustworthiness of the system.
+
+By implementing these security measures, the project successfully established a secure and fast MQTT connection, safeguarding the communication and ensuring the authenticity and integrity of the exchanged data.
+
+For more information, please refer to the [project report](docs/report/main.pdf).
+
 ## Appendix
 
 ### Prerequisites
