@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 from paho.mqtt.publish import single
 import sqlite3
+import time
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ec import ECDSA
 from cryptography.hazmat.primitives.hashes import BLAKE2b
@@ -89,31 +90,34 @@ database_cert, database_pub, database_key = load_cert_pub_priv(dev_name)
 id = database_cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
 
-client = mqtt.Client(id, clean_session=False)
-client.tls_set(certfile='../.test_certs/database_licore.crt',
-               keyfile='../.test_certs/database_licore.key',
-               ca_certs='../.test_certs/ca-root-cert.crt')
+def main():
+    client = mqtt.Client(id, clean_session=True)
+    client.tls_set(certfile='../.test_certs/database_licore.crt',
+                keyfile='../.test_certs/database_licore.key',
+                ca_certs='../.test_certs/ca-root-cert.crt')
 
-client.on_connect = on_connect
-client.on_message = on_message
+    client.on_connect = on_connect
+    client.on_message = on_message
 
-client.connect(broker, port, 60)
+    client.connect(broker, port, 60)
+    # Test message of parameter update for bidirectional communication proof of concept
+    tls_sets = {'ca_certs':"../.test_certs/ca-root-cert.crt",
+                'certfile':"../.test_certs/database_licore.crt",
+                'keyfile':"../.test_certs/database_licore.key"}
 
-# Test message of parameter update for bidirectional communication proof of concept
-tls_sets = {'ca_certs':"../.test_certs/ca-root-cert.crt",
-            'certfile':"../.test_certs/database_licore.crt",
-            'keyfile':"../.test_certs/database_licore.key"}
+    test_message = '0.2'
+    signature = database_key.sign(
+            test_message.encode('utf-8'),
+            ECDSA(BLAKE2b(64))
+        )
+    packet = test_message + "||" + signature.hex()
 
-test_message = 'Parameter Update: Testing'
-signature = database_key.sign(
-        test_message.encode('utf-8'),
-        ECDSA(BLAKE2b(64))
-    )
-packet = test_message + "||" + signature.hex()
+    single(topic='control_center/updates/auditor_mona/database_licore/SAMPLE_RATE',
+        payload=packet, qos=2,
+        hostname=broker, port = port,
+        tls=tls_sets, retain=True)
 
-single(topic='control_center/updates/auditor_mona/database_licore',
-       payload=packet, qos=0,
-       hostname=broker, port = port,
-       tls=tls_sets, retain=True)
+    client.loop_forever(timeout=30, max_packets=3000)
 
-client.loop_forever(timeout=30, max_packets=3000)
+if __name__ == '__main__':
+    main()
