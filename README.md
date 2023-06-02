@@ -8,7 +8,6 @@
   - [Problem Statement](#problem-statement)
   - [Project Summary](#project-summary)
   - [Usage and Installation](#usage-and-installation)
-    - [Prerequisites](#prerequisites)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Dependencies](#software-dependencies)
     - [General Installation](#general-installation)
@@ -55,10 +54,6 @@ By implementing these security measures, the project successfully established a 
 For more information, please refer to the [project report](docs/report/main.pdf).
 
 ## Usage and Installation
-
-### Prerequisites
-
-[(Back to top)](#table-of-contents)
 
 ### Hardware Requirements
 
