@@ -37,6 +37,10 @@ python3 publisher.py
 
 ## Subscriber
 
+The subscriber role is played by the clients who will be receiving messages from the broker to be stored in a database. This project assumes that there's only 1 client acting as the Control Center, it will be using a Linux distribution, specifically Ubuntu 20.04.6 LTS.
+
+The Control Center needs to manage a database, for this project we used SQLite 3, which is a lightweight database that comes pre-installed in most Linux distributions, see our [Database Creation Guide](../../db/README.md) for more information and the installation guide.
+
 ### General Specs
 
 - OS: Ubuntu 20.04.6 LTS
@@ -45,13 +49,6 @@ python3 publisher.py
 - RAM: 3919MiB
 - Disk: 256GiB SSD
 
-### Database Management
+### Setup
 
-- sqlite3: 3.31.1
-
-```bash
-sudo apt-get update
-sudo apt install sqlite3
-cd db
-./create_db.sh
-```
+Refer to the previous Setup section, but instead of running `python3 publisher.py`, run `python3 database_client.py`. Later on this process must be setup as a daemon.
