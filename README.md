@@ -7,8 +7,12 @@
   - [Table of Contents](#table-of-contents)
   - [Problem Statement](#problem-statement)
   - [Project Summary](#project-summary)
-  - [Appendix](#appendix)
+  - [Usage and Installation](#usage-and-installation)
     - [Prerequisites](#prerequisites)
+    - [Hardware Requirements](#hardware-requirements)
+    - [Software Dependencies](#software-dependencies)
+    - [General Installation](#general-installation)
+  - [Appendix](#appendix)
     - [Authors](#authors)
     - [License](#license)
 
@@ -50,21 +54,38 @@ By implementing these security measures, the project successfully established a 
 
 For more information, please refer to the [project report](docs/report/main.pdf).
 
-## Appendix
+## Usage and Installation
 
 ### Prerequisites
 
 [(Back to top)](#table-of-contents)
 
-- Domain acquisition
-  - Acquired through IONOS with a discount for 1 year
-  - The domain does not need to be protected by an SSL certificate in the site from which the domain was bought, the SSL certificate will be created later on inside the EC2 instance
-  - Modify default DNS servers to use those created by the hosted zone
-- Setup AWS account
-  - Security Groups
-  - Request SSL Certificate for acquired domain, create records in Route 53 when finished
-  - Create EC2 instance
-  - Add public ip address of EC2 instance to a new record in Route 53
+### Hardware Requirements
+
+[(Back to top)](#table-of-contents)
+
+This project was developed using a personal laptop which emulated an Auditor Client via VirtualBox. Consult the detailed specs of the machine in our [Client Creation Guide](src/clients/README.md).
+
+### Software Dependencies
+
+[(Back to top)](#table-of-contents)
+
+The software for the Broker is listed in the [Broker Configuration](src/broker/README.md), we've provided a sample bash snippet to install all the needed dependencies.
+
+The implementation of the Auditor requires mostly preinstalled software from the Python standard library included in most Linux distributions, but for the sake of reproducibility, we recommend installing the dependencies provided in our [Requirements](src/requirements.txt).
+
+### General Installation
+
+[(Back to top)](#table-of-contents)
+
+In order to reproduce our setup you have to follow our guides in the following order:
+
+1. [EC2 Setup](docs/report/)
+   1. [Certificate Creation](src/.test_certs/README.md)
+2. [Broker Configuration](src/broker/README.md)
+3. [Client Creation Guide](src/clients/README.md)
+
+## Appendix
 
 ### Authors
 
