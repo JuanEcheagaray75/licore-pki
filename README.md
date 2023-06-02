@@ -79,6 +79,7 @@ In order to reproduce our setup you have to follow our guides in the following o
    1. [Certificate Creation](src/.test_certs/README.md)
 2. [Broker Configuration](src/broker/README.md)
 3. [Client Creation Guide](src/clients/README.md)
+   1. [Database Setup](db/README.md)
 
 ## Appendix
 
