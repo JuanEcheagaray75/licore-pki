@@ -13,6 +13,7 @@
     - [General Installation](#general-installation)
   - [Appendix](#appendix)
     - [Authors](#authors)
+    - [Credits](#credits)
     - [License](#license)
 
 ## Problem Statement
@@ -97,6 +98,15 @@ The present project was a collaboration between the following authors:
 6. Carolina Longoria Lozano
 
 Please contact Juan Pablo Echeagaray González for any questions or comments.
+
+### Credits
+
+[(Back to top)](#table-of-contents)
+
+The present project was developed as part of the course [MA2006B: Use of Modern Algebras for Security and Cryptography ](https://samp.itesm.mx/Materias/VistaPreliminarMateria?clave=MA2006B&lang=EN) at [Tecnológico de Monterrey](https://tec.mx/en). The authors would like to thank the following professors for their guidance and support throughout the project:
+
+- Dr. Alberto Francisco Martínez Herrera
+- Dr. Daniel Otero Fadul
 
 ### License
 
