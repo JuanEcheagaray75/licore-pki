@@ -33,3 +33,5 @@ test_certs.zip
 *.csv
 *.txt
 *.sqlite3
+
+!src/test_blake.txt
