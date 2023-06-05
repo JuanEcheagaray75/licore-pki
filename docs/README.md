@@ -1,5 +1,11 @@
 # EC2 Broker Setup
 
+- [EC2 Broker Setup](#ec2-broker-setup)
+  - [Domain Name Acquisition](#domain-name-acquisition)
+  - [EC2 Instance Setup](#ec2-instance-setup)
+    - [Domain Name Server Setup](#domain-name-server-setup)
+
+
 The Mosquitto Broker needs to be setup in a central server, in this case an EC2 instance from AWS; the following steps were taken to setup the broker.
 
 ## Domain Name Acquisition

@@ -1,5 +1,10 @@
 # Broker Configuration
 
+- [Broker Configuration](#broker-configuration)
+  - [Mosquitto Installation](#mosquitto-installation)
+  - [Mosquitto Setup](#mosquitto-setup)
+
+
 ## Mosquitto Installation
 
 Mosquitto is already part of the Ubuntu 20.04 LTS repository. To install it, run the following commands:

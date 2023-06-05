@@ -1,5 +1,14 @@
 # LiCore Clients
 
+- [LiCore Clients](#licore-clients)
+  - [Publisher](#publisher)
+    - [General Specs](#general-specs)
+    - [Setup](#setup)
+  - [Subscriber](#subscriber)
+    - [General Specs](#general-specs-1)
+    - [Setup](#setup-1)
+
+
 The present directory hosts the available python scripts that interact with the MQTT broker. There is a publisher and a subscriber; the publisher is used to send messages to the broker, while the subscriber is used to receive messages from the broker and store them in a database.
 
 Each of the clients will share some pre-requisites, which are listed below.

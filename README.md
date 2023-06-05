@@ -75,7 +75,7 @@ The implementation of the Auditor requires mostly preinstalled software from the
 
 In order to reproduce our setup you have to follow our guides in the following order:
 
-1. [EC2 Setup](docs/report/)
+1. [EC2 Setup](docs/README.md)
    1. [Certificate Creation](src/.test_certs/README.md)
 2. [Broker Configuration](src/broker/README.md)
 3. [Client Creation Guide](src/clients/README.md)
