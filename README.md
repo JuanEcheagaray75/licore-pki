@@ -11,6 +11,7 @@
     - [Hardware Requirements](#hardware-requirements)
     - [Software Dependencies](#software-dependencies)
     - [General Installation](#general-installation)
+    - [Testing](#testing)
   - [Appendix](#appendix)
     - [Authors](#authors)
     - [Credits](#credits)
@@ -81,6 +82,12 @@ In order to reproduce our setup you have to follow our guides in the following o
 2. [Broker Configuration](src/broker/README.md)
 3. [Client Creation Guide](src/clients/README.md)
    1. [Database Setup](db/README.md)
+
+### Testing
+
+[(Back to top)](#table-of-contents)
+
+To test the system, we've provided a [test script](src/test.py) that will assert the correctness of the hash function BLAKE2B against a provided test vector.
 
 ## Appendix
 
