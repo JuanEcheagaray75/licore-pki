@@ -15,6 +15,9 @@
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+% \usepackage{subcaption}
+
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -65,9 +68,8 @@
             \vspace{0.2cm}
             \large Uso de álgebras modernas para seguridad y criptografía \\
             \vspace{1cm}
-            \textbf{Implementación de criptografía de clave pública para protección de comunicaciones con IoT en entornos de monitoreo y consumo de energía.}\\ % Nombre de la tarea
+            \textbf{Implementación de criptografía de clave pública para protección de comunicaciones con IoT en entornos de monitoreo y consumo de energía.}\\
             \vspace{0.7cm}
-            % Tabla de integrantes del equipo
             \begin{table}[h!]
                 \centering
                 \begin{tabular}{ ||c|c|| }
@@ -101,7 +103,6 @@
             \vspace{1cm}
         \end{center}
     \end{titlepage}
-    % \maketitle
 
     \tableofcontents
     \listoffigures
@@ -117,7 +118,6 @@
 
         A continuación estableceremos el objeto de nuestro estudio, plantearemos el problema a ser solucionado y elaboraremos una justificación. Después, haremos una investigación extensa sobre el estado del arte. Analizaremos los recursos disponibles para la resolución del problema, y nuestros objetivos para solucionarlo. Determinaremos la arquitectura de red a ser utilizada y propondremos nuestra metodología. Finalmente, discutiremos los resultados obtenidos.
 
-    % Descripción general de canvas
     \section{Objeto de estudio}
 
         El caso de estudio general que compete a un proyecto como el presentado es la implementación de un protocolo de clave pública para un \textit{SmartGrid}, que es equivalente a una red heterogénea de dispositivos IoT \cite{smart_grid_def}.
@@ -321,7 +321,7 @@
             \begin{table}[htbp]
                 \centering
                 \scalebox{0.8}{
-                \begin{tabular}{| m{2cm} | m{4cm} | m{4cm} | m{8cm} |}
+                \begin{tabular}{ | m{2cm} | m{4cm} | m{4cm} | m{8cm} | }
                     \hline
                     Nombre & Manufactura & Arranque & Producción \\
                     \hline
@@ -383,7 +383,6 @@
         \subsection{Arquitectura de red}
 
             En la figura \ref{fig:proposed_architecture} se presenta el esquema general de cómo se vería la red de auditores.
-
             \begin{figure}[htbp]
                 \centering
                 \includegraphics[scale=0.7]{proposed_architecture.png}
@@ -405,7 +404,7 @@
 
         \subsection{Funcionamiento}
 
-            1. \textbf{Fase de regitro}: El Centro de Control $CC$ crea certificados para todos los auditores $A_i$, el Broker $B$ y para sí mismo. Se establece como CA a $B$.
+            1. \textbf{Fase de registro}: El Centro de Control $CC$ crea certificados para todos los auditores $A_i$, el Broker $B$ y para sí mismo. Se establece como CA a $B$.
 
             2. \textbf{Envío de certificados}: $CC$ distribuye todos los certificados a cada uno de los clientes. Para el caso de $B$ se debe de seguir la guía de configuración propuesta en nuestra \href{https://github.com/JuanEcheagaray75/licore-pki/blob/master/src/.test_certs/README.md}{guía de certificados}.
 
@@ -422,6 +421,42 @@
             7. \textbf{Autenticación de tramas}: $CC$ verifica el paquete recibido haciendo uso de la clave pública $Pub_i$ de $A_i$, si $Verify(Sign(P, K_i), Pub_i)$ produce un resultado válido, la trama $P$ será guardada en la base de datos.
 
             8. \textbf{Actualización de parámetros}: $CC$ puede realizar un proceso similar para alterar el funcionamiento de $A_i$, deberá repetir los pasos 3 a 7 para enviar una actualización válida a través del tópico \texttt{control\_center/updates/ID\_i/\#}
+
+            \begin{figure}[!htbp]
+                \centering
+                \begin{minipage}{0.4\textwidth}
+                    \centering
+                    \includegraphics[scale=0.55]{proceso_centro_control.png}
+                    \caption{Funciones realizadas por Centro de Control en estado operativo}
+                    \label{fig:cc_process_flow}
+                \end{minipage}
+                \begin{minipage}{0.4\textwidth}
+                    \centering
+                    \includegraphics[scale=0.55]{proceso_auditor.png}
+                    \caption{Funciones realizadas por auditores en estado operativo}
+                    \label{fig:auditor_process_flow}
+                \end{minipage}
+            \end{figure}
+
+            En las figuras \ref{fig:cc_process_flow} y \ref{fig:auditor_process_flow} se presentan los procesos que se realizan en cada uno de los componentes de la red a partir de que comienza el paso \textbf{Inicio de Procesos}. En la tabla:
+            \begin{table}[!htbp]
+                \centering
+                \scalebox{0.8}{
+                \begin{tabular}{ |l|l| }
+                    \hline
+                    Propiedad & Valor \\
+                    \hline
+                    TLS & 1.2 \\
+                    Broker & mqtt.mona-temp-test.com \\
+                    Puerto & 883 \\
+                    Tiempo de muestreo & 0.2 s \\
+                    MQTT & MQTTv311 \\
+                    Transporte & TCP \\
+                    \hline
+                \end{tabular}}
+                \caption{Parámetros de comunicación}
+                \label{tab:communication_params}
+            \end{table}
 
     \section{Implementación y resultados}
 
@@ -470,6 +505,12 @@
             \label{fig:db}
         \end{figure}
 
+    \clearpage
+    \bibliographystyle{IEEEtran}
+    \bibliography{references.bib}
+
+    \clearpage
+    \appendix
     \section{Medio de contacto}\label{sec:contact}
 
         El desarrollo del proyecto así como la redacción del presente documento es un trabajo conjunto de:
@@ -493,9 +534,5 @@
         En caso de encontrar fallas en el código fuente, o que se necesite de una aclaración de la implementación propuesta; se pide que se abra un \textit{issue} en el repositorio en GitHub que puede ser accedido desde la siguiente \href{https://github.com/JuanEcheagaray75/licore-pki}{liga}.
 
         Para dudas generales sobre el proyecto, se puede contactar a Juan Pablo Echeagaray González, al correo \href{mailto:a00830646@tec.mx}{a00830646@tec.mx}
-
-    \clearpage
-    \bibliographystyle{IEEEtran}
-    \bibliography{references.bib}
 
 \end{document}
