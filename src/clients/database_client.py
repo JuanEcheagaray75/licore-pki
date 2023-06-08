@@ -1,7 +1,6 @@
 import paho.mqtt.client as mqtt
 from paho.mqtt.publish import single
 import sqlite3
-import time
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ec import ECDSA
 from cryptography.hazmat.primitives.hashes import BLAKE2b

@@ -6,8 +6,6 @@ from cryptography.hazmat.primitives.hashes import BLAKE2b
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.x509.oid import NameOID
 from utils import create_packets, load_cert_pub_priv
-import timeit
-
 
 # GENERAL PARAMETERS
 broker = "mqtt.mona-temp-test.com"
