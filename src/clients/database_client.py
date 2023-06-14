@@ -98,25 +98,33 @@ def main():
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.connect(broker, port, 60)
-    # Test message of parameter update for bidirectional communication proof of concept
-    tls_sets = {'ca_certs':"../.test_certs/ca-root-cert.crt",
-                'certfile':"../.test_certs/database_licore.crt",
-                'keyfile':"../.test_certs/database_licore.key"}
+    try:
+        client.connect(broker, port, 60)
+        # Test message of parameter update for bidirectional communication proof of concept
+        tls_sets = {'ca_certs':"../.test_certs/ca-root-cert.crt",
+                    'certfile':"../.test_certs/database_licore.crt",
+                    'keyfile':"../.test_certs/database_licore.key"}
 
-    test_message = '0.2'
-    signature = database_key.sign(
-            test_message.encode('utf-8'),
-            ECDSA(BLAKE2b(64))
-        )
-    packet = test_message + "||" + signature.hex()
+        test_message = '0.2'
+        signature = database_key.sign(
+                test_message.encode('utf-8'),
+                ECDSA(BLAKE2b(64))
+            )
+        packet = test_message + "||" + signature.hex()
 
-    single(topic='control_center/updates/auditor_mona/database_licore/SAMPLE_RATE',
-        payload=packet, qos=2,
-        hostname=broker, port = port,
-        tls=tls_sets, retain=True)
+        single(topic='control_center/updates/auditor_mona/database_licore/SAMPLE_RATE',
+            payload=packet,
+            qos=2,
+            hostname=broker,
+            port = port,
+            tls=tls_sets,
+            retain=False)
 
-    client.loop_forever(timeout=30, max_packets=3000)
+        client.loop_forever(timeout=30, max_packets=3000)
+
+    except KeyboardInterrupt:
+        print('Interrupted')
+        client.disconnect()
 
 if __name__ == '__main__':
     main()

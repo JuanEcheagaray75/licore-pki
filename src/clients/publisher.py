@@ -87,32 +87,36 @@ def main():
 
     packets = create_packets('../../db/processed/Prosumer_ABC.csv')
 
-    client.loop_start()
-    print('Publishing packets...')
-    for packet in packets:
+    try:
+        client.loop_start()
+        print('Publishing packets...')
+        for packet in packets:
 
-        # IMPORTANT: Hash length of Blake2b
-        # Signature algorithm is in pair with FIPS 186-4
-        # https://csrc.nist.gov/publications/detail/fips/186/4/final
-        # The source code is written in Rust, it does chop the hash, if
-        # the len of the digest is greater than 256 bits
-        # The standard imposes this behavior
-        signature = auditor_key.sign(
-            packet.encode('utf-8'),
-            ECDSA(BLAKE2b(64))
-        )
-        payload = packet + '||' + signature.hex()
-        client.publish(topic=f'audits/measures/{id}',
-                    payload=payload,
-                    qos=0)
+            # IMPORTANT: Hash length of Blake2b
+            # Signature algorithm is in pair with FIPS 186-4
+            # https://csrc.nist.gov/publications/detail/fips/186/4/final
+            # The source code is written in Rust, it does chop the hash, if
+            # the len of the digest is greater than 256 bits
+            # The standard imposes this behavior
+            signature = auditor_key.sign(
+                packet.encode('utf-8'),
+                ECDSA(BLAKE2b(64))
+            )
+            payload = packet + '||' + signature.hex()
+            client.publish(topic=f'audits/measures/{id}',
+                        payload=payload,
+                        qos=0)
 
-        print(f'Packet {packet} published')
-        sleep(SAMPLE_RATE)
+            print(f'Packet {packet} published')
+            sleep(SAMPLE_RATE)
 
-    print('Done!')
-    client.loop_stop()
-    client.disconnect()
+        print('Done!')
+        client.loop_stop()
+        client.disconnect()
 
+    except KeyboardInterrupt:
+        client.loop_stop()
+        client.disconnect()
 
 if __name__ == '__main__':
     main()
