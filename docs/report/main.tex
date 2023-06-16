@@ -16,8 +16,9 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage[font=footnotesize,labelfont=bf]{caption}
-% \usepackage{subcaption}
 
+
+\providecommand{\keywords}[1]{\textbf{\textit{Index terms---}} #1}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -99,7 +100,7 @@
             \vspace{0.2cm}
             \large Monterrey, Nuevo León \\
             \vspace{0.2cm}
-            \large 28 de mayo del 2023 \\
+            \large 16 de junio del 2023 \\
             \vspace{1cm}
         \end{center}
     \end{titlepage}
@@ -110,15 +111,22 @@
     \clearpage
     \renewcommand{\tablename}{Tabla}
 
+    \begin{abstract}
+        Este reporte presenta la implementación exitosa de un protocolo MQTT seguro para transmitir datos de consumo y producción de energía desde dispositivos de gama baja en entornos residenciales. Al integrar TLS y criptografía de curvas elípticas (ECC), se garantizó la confidencialidad, integridad y autenticidad de los datos al tiempo que se optimizaron los requisitos de memoria y procesamiento. TLS proporcionó un mecanismo de cifrado robusto para proteger el canal de comunicación, mientras que ECC, con sus tamaños de clave más pequeños y su menor sobrecarga computacional, resultó adecuado para dispositivos con recursos limitados. Esta implementación permite una comunicación segura y eficiente para dispositivos IoT, particularmente en contextos donde predominan los dispositivos de gama baja, garantizando la privacidad y seguridad de los datos sensibles.
+    \end{abstract}
+    \keywords{MQTT, TLS, ECC, IoT, SmartGrid, Confidencialidad, Integridad, Autenticidad}
+
     \section{Introducción}
 
         Mientras avanzamos en el camino de la industrialización, los datos se vuelven más y más vitales para el funcionamiento de cualquier empresa. Más allá de ser de suma importancia para el análisis de su rendimiento, muchas veces fungen como materia prima de sus procesos. Las fugas de información no son necesariamente nuevas, pero la era digital ha permitido que ocurran de una manera masiva, y ha llegado a afectar a empresas renombradas como Yahoo, Microsoft y Facebook \cite{data_breach_biggest}. Muchas veces estas empresas manejan datos sensibles, y una filtración de datos es un problema grave para ellos y sus usuarios.
 
         Este es el caso para nuestros socios formadores, \textit{Cocoa} y \textit{LiCore}. \textit{Cocoa} se enfoca en facilitar la transición energías limpias utilizando herramientas digitales \cite{cocoa}, y  \textit{LiCore} se enfoca en desarrollar tecnología electrónica en áreas relacionadas a la energía sostenible. Una parte clave en su proceso consiste en documentar información de la cantidad y calidad de la energía, que al obtenerse pasa a un auditor, y del auditor a un centro de control. Estos datos al ser de carácter sensible, necesitan ser transmitidos por un medio seguro, por lo que es imperativo la implementación de un medio de transporte seguro que se adapte a los dispositivos que utiliza el Socio Formador.
 
-        A continuación estableceremos el objeto de nuestro estudio, plantearemos el problema a ser solucionado y elaboraremos una justificación. Después, haremos una investigación extensa sobre el estado del arte. Analizaremos los recursos disponibles para la resolución del problema, y nuestros objetivos para solucionarlo. Determinaremos la arquitectura de red a ser utilizada y propondremos nuestra metodología. Finalmente, discutiremos los resultados obtenidos.
+        El presente escrito se organiza de la siguiente manera: en la sección \ref{sec:study_object} se presenta de forma general la problemática a resolver, en las secciones \ref{sec:problem_statement} y \ref{sec:justification} se delimita la problemática a resolver así como también se brinda una justificación para nuestro trabajo. En el apartado \ref{sec:state_art} se presenta un compilado introductorio al estado del arte de la criptografía y ciberseguridad para la protección de canales como el propuesto.
 
-    \section{Objeto de estudio}
+        En la sección \ref{sec:resources} se presentan las limitantes económicas y operacionales impuestas por el Socio Formador, en \ref{sec:objectives} se establecen los objetivos del proyecto. En las secciones \ref{sec:architecture} y \ref{sec:implementation} se presenta la arquitectura propuesta así como su implementación y resultados; en la sección \ref{sec:conclusions} se presentan las conclusiones del estudio.
+
+    \section{Objeto de estudio} \label{sec:study_object}
 
         El caso de estudio general que compete a un proyecto como el presentado es la implementación de un protocolo de clave pública para un \textit{SmartGrid}, que es equivalente a una red heterogénea de dispositivos IoT \cite{smart_grid_def}.
 
@@ -126,11 +134,11 @@
 
         Los datos a enviar serán de carácter energético, conteniendo información del consumo y generación de energía eléctrica asociados a un domicilio y a una etiqueta de tiempo. Los datos generados son de carácter sensible, pues algún agente malicioso podría utilizar algún método de \textit{spyware} para recolectar dichos datos, realizar algún proceso de caracterización para lanzar un ataque acotado y personalizado a los entes asociados al conjunto de datos vulnerados.
 
-    \section{Planteamiento del problema}
+    \section{Planteamiento del problema} \label{sec:problem_statement}
 
         \subsection{Descripción general de la problemática}
 
-            En la figura \ref{fig:dataExchange} se muestra un esquema simplificado más general de la red \textit{SmartGrid} que se busca asegurar. En primera instancia, se busca proteger el intercambio de información entre cada auditor y el control center. Se busca asegurar la confidencialidad, integridad y autenticidad en todo el proceso de comunicación para que solamente los dispositivos autorizados por el centro deo control puedan publicar y acceder a los datos medidos, que la información medida no sufra de alteración alguna y que existan los medios suficientes para aplicar un criterio de no repudio a los auditores participantes de la red.
+            En la figura \ref{fig:dataExchange} se muestra un esquema simplificado del \textit{SmartGrid} que se busca asegurar. En primera instancia, se busca proteger el intercambio de información entre cada auditor y el control center. Se busca asegurar la confidencialidad, integridad y autenticidad en todo el proceso de comunicación para que solamente los dispositivos autorizados por el centro deo control puedan publicar y acceder a los datos medidos, que la información medida no sufra de alteración alguna y que existan los medios suficientes para aplicar un criterio de no repudio a los auditores participantes de la red.
 
             En conjunto con la Figura \ref{fig:dataExchange}, se proporciona la Tabla \ref{tab:component_basic} en la que se enumera y describen las labores de los componentes básicos de la red solicitada por el Socio Formador.
             \begin{table}[htbp]
@@ -146,36 +154,36 @@
                     Centro de control & Procesamiento de lecturas enviadas por auditores, respaldo encriptado de mediciones en una base de datos & Servidor en la nube \\
                     \hline
                 \end{tabularx}
-                \label{tab:component_basic}
                 \caption{Listado general de los componentes de la red}
+                \label{tab:component_basic}
             \end{table}
 
             \begin{figure}[htbp]
                 \centering
-                \includegraphics[scale=0.30]{img/dataExchange.png}
+                \includegraphics[scale=0.30]{dataExchange.png}
                 \caption{Intercambio de Datos a ser Protegido [Extraído de CANVAS]}
                 \label{fig:dataExchange}
             \end{figure}
 
         \subsection{Delimitación del problema}
 
-            Para fines académicos a organización socio-formadora propone el escenario representado en la Figura \ref{fig:esquema}. Se dispondrá de dos auditores, que reportan el consumo y generación de energía eléctrica de 2 residencias distintas. Los datos en cuestión no serán obtenidos en tiempo real, sino que han sido proporcionados por el socio-formador en el formato de un archivo csv con los registros históricos de las mediciones.
+            Para fines académicos la organización socio-formadora propone el escenario representado en la Figura \ref{fig:esquema}. Se dispondrá de dos auditores, que reportan el consumo y generación de energía eléctrica de 2 residencias distintas. Los datos en cuestión no serán obtenidos en tiempo real, sino que han sido proporcionados por el socio-formador en el formato de un archivo csv con los registros históricos de las mediciones.
 
             Los datos recolectados por los auditores deben de ser enviados por internet protegidos hasta que lleguen al Centro de Control. En el Centro de Control, los datos serán almacenados en una base de datos en donde serán respaldados con un esquema de encriptado seguro.
 
             \begin{figure}[h]
                 \centering
-                \includegraphics[scale=0.35]{img/esquema_reto.png}\\
+                \includegraphics[scale=0.35]{esquema_reto.png}
                 \caption{Esquema sugerido para la prueba de concepto (PdC).[Imagen referenciada de CANVAS]}
                 \label{fig:esquema}
             \end{figure}
 
-    \section{Justificación}
+    \section{Justificación} \label{sec:justification}
 
         \subsection{Enfoque en Sostenibilidad}
 
             Nuestro propósito se alinea con múltiples de los Objetivos de Desarrollo Sustentable de las ONU.
-            \begin{itemize}
+            \begin{itemize}[noitemsep, leftmargin=*]
                 \item \textbf{Objetivo 9}: \enquote{Construir infraestructuras resilientes, promover la industrialización sostenible y fomentar la innovación.}  \cite{obj9} Lo vemos reflejado en nuestro deseo de innovar e industrializar sin sacrificar lo sostenible.
                 \item \textbf{Objetivo 11}: \enquote{Lograr que las ciudades sean más inclusivas, seguras, resilientes y sostenibles.} \cite{obj11} Este objetivo esta integrado en las bases del proyecto, con la intención del socio formador de acercar la energía al consumidor, y con su elección de utilizar energías renovables.
                 \item \textbf{Objetivo 12}: \enquote{Garantizar modalidades de consumo y producción sostenibles.}\cite{obj12} Es uno de nuestros principales enfoques, al utilizar algoritmos ligeros que serán lo mas sostenibles posibles, y al ayudar a que un proceso de producción de energía sostenible pueda efectuar de manera segura.
@@ -185,13 +193,13 @@
 
             De acuerdo a IBM, el costo global promedio en 2022 de una filtración de datos fue de 4 millones de dólares \cite{cost_DB}. Esta cifra sigue un patrón de aumento a través del tiempo, lo que nos indica que cada vez se vuelve más caro tener datos desprotegidos. Lo económico no es lo único que se ve afectado por un ataque de esta naturaleza. El estudio del Instituto Ponmeon, "The Aftermath of a Mega Data Breach: Consumer Sentiment", clasifica a las filtraciones de datos como el tercer factor más influyente para la reputación de una empresa, junto con desastres naturales y mal servicio al cliente \cite{ponmeon}.
 
-            Cada segundo se conectan a internet alrededor de 127 dispositivos nuevos. Estos dispositivos atraen a ciberdelicuentes debido a que muchas de las personas que compran dichos aparatos desconocen los puntos importantes de ciberseguridad al momento de adquirirlo, el cual puede poner en riesgo la privacidad del usuario. Los dispositivos IoT usualmente son objetivo de ataques forzados. Los ataques forzados usando motores de búsqueda especializados en donde se seleccionan equipos de protocolos disponibles para conexión, así forzando de manera automática los nombres de usuario y contraseñas comunes. Se estima que a nivel global, la cifra de ataques a dispositivos IoT es mayor a los mil 500 millones. En México, el primer semestre de 2021 se detectaron 661 mil 715 ataques a dispositivos IoT \cite{rios_2022}. La cantidad de ataques tuvo un incremento de 197 por ciento a comparación con el año 2020 en donde se registran 222 mil 599.
+            Cada segundo se conectan a internet alrededor de 127 dispositivos nuevos. Estos dispositivos atraen a ciberdelicuentes debido a que muchas de las personas que compran dichos aparatos desconocen los puntos importantes de ciberseguridad al momento de adquirirlo, el cual puede poner en riesgo la privacidad del usuario. Los dispositivos IoT usualmente son objetivo de ataques forzados. Los ataques forzados usando motores de búsqueda especializados en donde se seleccionan equipos de protocolos disponibles para conexión, así forzando de manera automática los nombres de usuario y contraseñas comunes. Se estima que a nivel global, la cifra de ataques a dispositivos IoT es mayor a los 1,500 millones. En México, el primer semestre de 2021 se detectaron 661 mil 715 ataques a dispositivos IoT \cite{rios_2022}. La cantidad de ataques tuvo un incremento de 197 por ciento a comparación con el año 2020 en donde se registran 222 mil 599.
 
             Como se ha mencionado anteriormente los ataques a dispositivos IoT son comunes y costosos, a continuación se describirán algunos ataques o vulnerabilidades encontradas en dispositivos por el mal uso de primitivas criptográficas:
 
             \begin{itemize}
                 \item En noviembre 2016, cibercriminales apagaron la calefacción de dos edificios en la ciudad finlandesa de Lappeenranta. Después de este ataque, se lanzó un segundo ataque DDoS, en donde obligaron a los controladores de calefacción a reiniciar el sistema repetidamente así evitando que la calefacción se encendiera. Este fue un ataque severo ya que en Finlandia se experimentan temperaturas muy bajas en esa época del año \cite{husar_2022}.
-                \item En el 2016, investigadores encontraron que alrededor de 100 millones de vehículos Volkswagen vendidos desde 1995 pueden ser atacados por cibercriminales con una facilidad relativa para abrir puertas de forma inalámbrica sin tener la llave. Los vehículos eran vulnerable debido a que se usaron una mínima cantidad de claves privadas compartidas, en donde una vez que se viole una sola clave privada entonces millones de vehículos se verán comprometidos ya que los 100 millones de vehículos y sus llaveros fueron programados con pocas claves secretas comunes utilizadas en todo el mundo. Esto comprometía la seguridad de los pasajeros ya que ellos suponen que el vehículo esta bien cerrado comprometiéndolos a un robo en la carretera, a que criminales coloquen discretamente un objeto o una persona con intenciones maliciosas dentro del automóvil, pone en riesgo la computadora de a bordo del vehículo en donde el criminal puede  desactivar los frenos mientras se enciende el sistema de limpiaparabrisas en una curva, etc  \cite{garcia_oswald_kasper_pavlides}.
+                \item En el 2016, investigadores encontraron que alrededor de 100 millones de vehículos Volkswagen vendidos desde 1995 pueden ser atacados por cibercriminales con una facilidad relativa para abrir puertas de forma inalámbrica sin tener la llave. Los vehículos eran vulnerable debido a que se usaron una mínima cantidad de claves privadas compartidas, en donde una vez que se viole una sola clave privada entonces millones de vehículos se verán comprometidos ya que los 100 millones de vehículos y sus llaveros fueron programados con pocas claves secretas comunes utilizadas en todo el mundo. Esto comprometía la seguridad de los pasajeros ya que ellos suponen que el vehículo esta bien cerrado comprometiéndolos a un robo en la carretera, a que criminales coloquen discretamente un objeto o una persona con intenciones maliciosas dentro del automóvil, pone en riesgo la computadora a bordo del vehículo en donde el criminal puede  desactivar los frenos mientras se enciende el sistema de limpiaparabrisas en una curva, etc  \cite{garcia_oswald_kasper_pavlides}.
                 \item En el 2017, se descubrió que decenas de millones de dispositivos como cámaras de vigilancia de aeropuertos, sensores, equipos de red y dispositivos de IoT eran vulnerables debido a una falla que permitía a los cibercriminales obtener control remoto sobre los dispositivos o bloquearlos. La vulnerabilidad encontrada la nombraron "Devil's Ivy". Esta fue descubierto debido a que investigadores de Senrio quienes seleccionaron cámaras de seguridad de alta gama fabricadas por Axis Communications en donde 249 de los 251 cámaras eran vulnerables a atacantes remotos no autenticados que podían interpretar una transmisión de vídeo, reiniciar cámaras o pausar una transmisión de vídeo mientras cometen un delito \cite{spring_2019}. Encontraron que no solamente Axis Communications usaba este software defectuoso si no que otras 34 compañías como Microsoft, IBM, Xerox y Adobe.
             \end{itemize}
 
@@ -256,24 +264,37 @@
 
             En \cite{lohachab2019ecc} se propone un esquema ligero que no utiliza el concepto de certificados para el proceso de autenticación y autorización, para ser remplazados por un esquema de comunicación sobre MQTT incluyendo \textit{hasheo} con firmado de claves públicas generadas de forma local, sin que se incurra en un alto consumo energético o que se añada una latencia descomunal al proceso de comunicación.
 
-    \section{Recursos disponibles}
+        \subsection{Protección de la base de datos}
 
-        La organización socio formadora ha estipulado que el auditor propuesto no puede superar un costo total de 100 USD; sin embargo ha manifestado su preferencia por un auditor que tenga un costo alrededor de los 50 USD. Para emular dichos dispositivos se propone el uso de dos tarjetas de microprocesador Raspberry Pi 3B
-        (modelo a determinar en base a disponibilidad del laboratorio de robótica).
+            En \cite{mukherjee2019popular} se presentan cuatro modelos de encriptación para la protección de la base de datos:
+            \begin{itemize}[noitemsep, leftmargin=*]
+                \item Always Encrypted (AE)
+                \item Transparent Data Encryption (TDE) \& Cell Level Encryption (CLE)
+                \item Dynamic Data Masking (DDE)
+                \item Vormetric Transparent Encryption (VTE)
+            \end{itemize}
 
-        Para la emulación del centro de control se propone utilizar una instancia de EC2 de Amazon Web Services, en la que se emulará un servidor con una base de datos que utilice MySQL.
+            La nueva función de AE permite a los administradores de bases de datos cifrar datos confidenciales dentro de una aplicación, sin la necesidad de revelar las claves de cifrado al servidor. Mientras que TDE y CLE cifran una base de datos completa mientras está en reposo (a nivel disco), AE cifra a nivel de columna pero con varias ventajas adicionales (por cable).
 
-    \section{Objetivos}
+    \section{Recursos disponibles} \label{sec:resources}
+
+        La organización socio formadora ha estipulado que el auditor propuesto no puede superar un costo total de 100 USD; sin embargo ha manifestado su preferencia por un auditor que tenga un costo alrededor de los 50 USD. Para emular dichos dispositivos se propone el uso de dos tarjetas de microprocesador Raspberry Pi 3B.
+
+        La emulación del broker será realizada a través de una instancia de EC2 de Amazon Web Services, para el Centro de Control se propone utilizar un computador personal con SQLite instalado.
+
+        Se aclara que el uso de un computador personal para emular el Centro de Control solo es permisible en un entorno de pruebas, en un entorno de producción se recomienda utilizar una instancia de EC2 dedicada.
+
+    \section{Objetivos} \label{sec:objectives}
 
         El objetivo principal de este proyecto es el desarrollo de una arquitectura de red que permita que un conjunto de dispositivos auditores envíen lecturas de consumo y generación de energía eléctrica a un centro de control por medio de una conexión WiFi. Se parte de que los auditores tienen poder computacional bajo, y los datos generados deben de ser enviados y almacenados de forma segura.
 
         En términos cuantitativos se plantean las siguientes metas:
-        \begin{enumerate}
+        \begin{itemize}[noitemsep, leftmargin=*]
             \item Costo total del dispositivo auditor menor a \textbf{100 USD} por pieza.
             \item El tiempo de envío seguro de datos debe de ser menor a \textbf{15 minutos}, puesto que las lecturas son generadas en ventanas de tiempo de 15 minutos.
-        \end{enumerate}
+        \end{itemize}
 
-    \section{Arquitectura propuesta}
+    \section{Arquitectura propuesta} \label{sec:architecture}
 
         En base a la investigación realizada así como a las comparativas del desempeño de los diferentes algoritmos criptográficos y los requisitos monetarios impuestos por el Socio Formador; se propone un esquema criptográfico adaptado de \cite{lohachab2019ecc}. Nuestra propuesta aprovecha el tamaño de llave reducido de curvas elípticas así como la rapidez con la que se pueden aplicar la función BLAKE-2 en dispositivos Raspberry Pi 3B.
 
@@ -308,11 +329,11 @@
 
                 El protocolo MQTT (Message Queue Telemetry Transport) es un protocolo de publicación-suscripción, este facilita la conexión a una gran cantidad de dispositivos y además tiene cierta facilidad para comprobar que el mensaje llegue al objetivo proporcionando una seguridad mediante certificados electrónicos \cite{lliso2021uso}. Este protocolo de mensajería asíncrona es utilizado en el ámbito de las comunicaciones machine-to-machine (M2M) en el campo de IoT \cite{mahedero2020desarrollo}.
 
-                El modelo publicación y suscripción funciona mediante la conexión a un broker por parte de los clientes. Para el envío de mensajes y para su posterior recepción, ambos se suscriben a un topic donde se disponen los mensajes, convirtiendo este modelo en un modelo no-bloqueante. Un cliente MQTT es tanto los suscriptores como los publicadores, un cliente MQTT puede ser un suscriptor, publicador o ambos a la vez \cite{mahedero2020desarrollo}.
+                El modelo publicación y suscripción funciona mediante la conexión a un broker por parte de los clientes. Para el envío de mensajes y para su posterior recepción, ambos se suscriben a un tópico donde se disponen los mensajes, convirtiendo este modelo en un modelo no-bloqueante. Un cliente MQTT es tanto los suscriptores como los publicadores, un cliente MQTT puede ser un suscriptor, publicador o ambos a la vez \cite{mahedero2020desarrollo}.
 
-                El broker MQTT es el servidor encargado de la distribución de los mensajes a los receptores; este recibe los mensajes, realiza un chequeo del topic al que están suscritos y los encamina hacia los clientes suscritos a este mismo topic. El broker brinda la posibilidad que se guarden los mensajes hasta que el cliente al que va dirigido se conecte. Otra función que tiene el broker es la de autentificar la identidad de los clientes como medida de seguridad \cite{mahedero2020desarrollo}.
+                El broker MQTT es el servidor encargado de la distribución de los mensajes a los receptores; este recibe los mensajes, realiza un chequeo del tópico al que están suscritos y los encamina hacia los clientes suscritos a este mismo tópico. El broker brinda la posibilidad que se guarden los mensajes hasta que el cliente al que va dirigido se conecte. Otra función que tiene el broker es la de autentificar la identidad de los clientes como medida de seguridad \cite{mahedero2020desarrollo}.
 
-                El tópico, el tema del mensaje, sirve como identificador al broker para poder dirigir cada uno de los mensajes recibidos hacia los clientes adecuados que estén suscritos al topic \cite{mahedero2020desarrollo}.
+                El tópico (el tema del mensaje), sirve como identificador al broker para poder dirigir cada uno de los mensajes recibidos hacia los clientes adecuados que estén suscritos al topic \cite{mahedero2020desarrollo}.
 
         \subsection{Sumario de componentes}
 
@@ -438,7 +459,7 @@
                 \end{minipage}
             \end{figure}
 
-            En las figuras \ref{fig:cc_process_flow} y \ref{fig:auditor_process_flow} se presentan los procesos que se realizan en cada uno de los componentes de la red a partir de que comienza el paso \textbf{Inicio de Procesos}. En la tabla:
+            En las figuras \ref{fig:cc_process_flow} y \ref{fig:auditor_process_flow} se presentan los procesos que se realizan en cada uno de los componentes de la red a partir de que comienza el paso \textbf{Inicio de Procesos}. En la tabla \ref{tab:communication_params} se detallan los parámetros específicos usados en los diagramas anteriores:
             \begin{table}[!htbp]
                 \centering
                 \scalebox{0.8}{
@@ -458,7 +479,7 @@
                 \label{tab:communication_params}
             \end{table}
 
-    \section{Implementación y resultados}
+    \section{Implementación y resultados} \label{sec:implementation}
 
         Para probar el código que se ha desarrollado se ha de clonar el repositorio provisto en la siguiente \href{https://github.com/JuanEcheagaray75/licore-pki}{liga}, después se deberán ejecutar los siguientes comandos en una terminal de Linux:
         \begin{lstlisting}[language=bash]
@@ -504,6 +525,18 @@
             \caption{Base de datos con mensajes procesados}
             \label{fig:db}
         \end{figure}
+
+    \section{Trabajo futuro}
+
+        Se considera que la propuesta de base de datos local alojada directamente en el Centro de Control es el principal punto de cambio que debe manejarse en un futuro. Dados los limitantes económicos del proyecto no se adquirió un servicio de base de datos; pero se recomienda considerar el uso de un \textit{S3 Bucket} de AWS que podría integrarse de forma sencilla con la solución propuesta.
+
+    \section{Conclusiones} \label{sec:conclusions}
+
+        En conclusión, la implementación exitosa de un protocolo MQTT seguro para dispositivos de bajo consumo marca un hito significativo en el dominio de la transmisión de datos de consumo y producción de energía desde una red de residencias. Al aprovechar el poder de TLS (Transport Layer Security) en conjunto con la criptografía de curvas elípticas (ECC), hemos logrado una solución robusta y eficiente que garantiza la confidencialidad, integridad y autenticidad de los datos a la vez que aborda las limitaciones de memoria y procesamiento de estos dispositivos.
+
+        La adopción de TLS proporciona un mecanismo de cifrado sólido que protege el canal de comunicación entre los dispositivos de bajo consumo y la infraestructura de recopilación de datos. La integración de ECC como el algoritmo criptográfico subyacente ofrece varias ventajas, incluidos sus tamaños de clave más pequeños y los requisitos computacionales reducidos en comparación con los métodos criptográficos tradicionales. Esto permite que los dispositivos de bajo consumo realicen operaciones de cifrado y descifrado de manera eficiente, sin sobrecargar sus recursos limitados.
+
+        La combinación de TLS y ECC ha demostrado ser un enfoque viable y seguro para asegurar la comunicación MQTT en el contexto de la transmisión de datos de consumo de energía. No solo proporciona un alto nivel de protección contra el espionaje, la manipulación y el acceso no autorizado, sino que también optimiza la huella de memoria y procesamiento, lo que lo hace adecuado para entornos con recursos limitados. Esta implementación abre nuevas posibilidades para la implementación generalizada de soluciones IoT seguras, asegurando la privacidad y seguridad de los datos sensibles al tiempo que se adaptan a las limitaciones de los dispositivos de bajo consumo. A medida que la demanda de dispositivos IoT continúa aumentando, la integración de protocolos MQTT seguros se vuelve cada vez más crucial para construir una infraestructura resiliente y confiable.
 
     \clearpage
     \bibliographystyle{IEEEtran}
